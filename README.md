@@ -174,7 +174,8 @@ return strings;
 ### 源码地址
 https://github.com/xieyucan/spring-boot-easy-connection-pool
 
-
+### 后续更新说明
+如果这个插件使用的人较多，后面会增加动态读取数据库中的连接配置信息并添加链接管理界面及连接池管理信息。加油！
 
 
 
