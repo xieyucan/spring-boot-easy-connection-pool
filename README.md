@@ -1,2 +1,182 @@
-# spring-boot-easy-connection-pool
-springboot连接池、动态配置多数据源连接池，特别适合大数据部门、数据中台服务的多数据源连接池
+## SpringBoot动态配置多数据源连接池
+### 背景
+#### 数据部后端服务特点：
+	1. 需要对接多种数据源
+	2. 数据源存储大量数据
+	3. 需要为不同的业务部门、数据看板、数据报表提供数据服务
+#### 数据部后端服务痛点：
+	1. 服务中多数据源配置繁琐、切换逻辑复杂
+	2. 不适用连接池，系统性能低、容易拉垮数据源
+	3. 使用连接池，多数据源多连接池配置逻辑复杂容易出错
+	4. 大型系统中由于数据源过多数据源会集中在数据库中管理，这样更加需要动态太管理配置数据源
+### 插件简介
+基于上述项目背景，这里统一封装了动态多数据源连接池配置插件。只需要在项目中引入插件，在属性文件中添加必要的数据源连接配置信息及连接池参数，就可以通过注解动态切换数据源、无论是读写分离、主从配置还是一主多从的数据源都可以通过配置动态生成DataSource连接池。
+项目中各部分注释比较详细，对于二次开发扩展也非常方便，这么好的插件有什么理由不去使用呢。
+### 插件功能特点
+	1. 动态支持多数据源连接池配置
+	2. 理论上支持无限多个数据源连接池
+	3. 通过注解切换数据源
+	4. 非常适用数据库读写分离、一主多从等业务场景
+	5. 代码逻辑简单，扩展自原生Spring接口
+	6. 代码注释详细，易于二次开发
+
+### 使用说明
+插件是基于SpringBoot开发maven管理的，使用步骤
+
+1.添加插件maven依赖
+```java
+<dependency>
+	<groupId>com.xh.springboot</groupId>
+	<artifactId>spring-boot-easy-connection-pool</artifactId>
+	<version>1.0-SNAPSHOT</version>
+</dependency>
+```
+
+2.启动类中添加引用
+```java
+@Import({DynamicDataSourceRegister.class})
+```
+
+3.必要的连接属性配置
+说明：spring.datasource.names属性配置数据资源名,如果连接的数据源没有那么多请记得在这里移除掉。默认数据源使用了JPA，使用过的持久层技术有JdbcUtils,Hibernate,IBatis和MyBatis,JdbcTemplate,Jpa。现在写项目最常用的持久层技术是JPA+JdbcTemplate，持久层技术方案众多、好坏只有自己去品。能解决业务场景问题、开发效率高用的开心就好。
+
+```java
+server.port=8080
+#db,数据源名字
+spring.datasource.names=db1,db2,db3
+spring.datasource.type=com.zaxxer.hikari.util.DriverDataSource
+#jpa
+spring.jpa.database=mysql
+spring.jpa.show-sql=true
+spring.jpa.generate-ddl=true
+spring.jpa.hibernate.ddl-auto=update
+#mysql-1
+#表示使用基于DriverManager的配置
+spring.datasource.hikari.jdbcUrl=jdbc:mysql://localhost:3306/db
+#数据库连接用户名
+spring.datasource.hikari.username=root
+#数据库连接密码
+spring.datasource.hikari.password=root
+#数据库连接驱动
+spring.datasource.hikari.driverClassName=com.mysql.cj.jdbc.Driver
+#池中维护的最小空闲连接数,如果空闲连接低于此值并且总连接数小于maximumPoolSize，则HC将快速有效的添加其他连接
+spring.datasource.hikari.minimumIdle=10
+#池中维护的最大连接数
+spring.datasource.hikari.maximumPoolSize=15
+#控制连接是否自动提交事务
+spring.datasource.hikari.autoCommit=true
+#空闲连接闲置时间
+spring.datasource.hikari.idleTimeout=30000
+#连接池名称
+spring.datasource.hikari.poolName=HikariCP1
+#连接最长生命周期,如果不等于0且小于30秒则会被重置回30秒
+spring.datasource.hikari.maxLifetime=1800000
+#从池中获取连接的最大等待时间默认30000毫秒，如果小于250毫秒则被重置会30秒
+spring.datasource.hikari.connectionTimeout=30000
+#测试连接有效性最大超时时间,默认5秒如果小于250毫秒，则重置回5秒
+spring.datasource.hikari.validationTimeout=5000
+#测试连接是否有效SQL，PS:不同数据库的测试SQL有可能不一样！
+spring.datasource.hikari.connectionTestQuery=SELECT 1
+#控制默认情况下从池中获取的Connections是否处于只读模式
+spring.datasource.hikari.readOnly=false
+#是否在其自己的事务中隔离内部池查询，例如连接活动测试。通常使用默认值，默认值：false
+spring.datasource.hikari.isolateInternalQueries=false
+#此属性控制是否注册JMX管理Bean
+spring.datasource.hikari.registerMbeans=false
+#此属性控制是否可以通过JMX（Java Management Extensions，即Java管理扩展，它提供了一种在运行时动态管理资源的体系结构）挂起和恢复池
+spring.datasource.hikari.allowPoolSuspension=false
+#mysql-2
+spring.datasource.db1.hikari.jdbcUrl=jdbc:mysql://localhost:3306/db1
+spring.datasource.db1.hikari.username=root
+spring.datasource.db1.hikari.password=root
+spring.datasource.db1.hikari.driverClassName=com.mysql.cj.jdbc.Driver
+spring.datasource.db1.hikari.minimumIdle=10
+spring.datasource.db1.hikari.maximumPoolSize=15
+spring.datasource.db1.hikari.autoCommit=true
+spring.datasource.db1.hikari.idleTimeout=30000
+spring.datasource.db1.hikari.poolName=HikariCP2
+spring.datasource.db1.hikari.maxLifetime=1800000
+spring.datasource.db1.hikari.connectionTimeout=30000
+spring.datasource.db1.hikari.validationTimeout=5000
+spring.datasource.db1.hikari.connectionTestQuery=SELECT 1
+spring.datasource.db1.hikari.readOnly=false
+spring.datasource.db1.hikari.isolateInternalQueries=false
+spring.datasource.db1.hikari.registerMbeans=false
+spring.datasource.db1.hikari.allowPoolSuspension=false
+#mysql-2
+spring.datasource.db2.hikari.jdbcUrl=jdbc:mysql://localhost:3306/db2
+spring.datasource.db2.hikari.username=root
+spring.datasource.db2.hikari.password=root
+spring.datasource.db2.hikari.driverClassName=com.mysql.cj.jdbc.Driver
+spring.datasource.db2.hikari.minimumIdle=10
+spring.datasource.db2.hikari.maximumPoolSize=15
+spring.datasource.db2.hikari.autoCommit=true
+spring.datasource.db2.hikari.idleTimeout=30000
+spring.datasource.db2.hikari.poolName=HikariCP3
+spring.datasource.db2.hikari.maxLifetime=1800000
+spring.datasource.db2.hikari.connectionTimeout=30000
+spring.datasource.db2.hikari.validationTimeout=5000
+spring.datasource.db2.hikari.connectionTestQuery=SELECT 1
+spring.datasource.db2.hikari.readOnly=false
+spring.datasource.db2.hikari.isolateInternalQueries=false
+spring.datasource.db2.hikari.registerMbeans=false
+spring.datasource.db2.hikari.allowPoolSuspension=false
+#clickHouse-1
+spring.datasource.db3.hikari.jdbcUrl=jdbc:clickhouse://
+spring.datasource.db3.hikari.username=root
+spring.datasource.db3.hikari.password=root
+spring.datasource.db3.hikari.driverClassName=ru.yandex.clickhouse.ClickHouseDriver
+spring.datasource.db3.hikari.minimumIdle=5
+spring.datasource.db3.hikari.maximumPoolSize=10
+spring.datasource.db3.hikari.autoCommit=true
+spring.datasource.db3.hikari.idleTimeout=30000
+spring.datasource.db3.hikari.poolName=HikariCP4
+spring.datasource.db3.hikari.maxLifetime=1800000
+spring.datasource.db3.hikari.connectionTimeout=30000
+spring.datasource.db3.hikari.validationTimeout=5000
+spring.datasource.db3.hikari.connectionTestQuery=SELECT 1
+spring.datasource.db3.hikari.readOnly=false
+spring.datasource.db3.hikari.isolateInternalQueries=false
+spring.datasource.db3.hikari.registerMbeans=false
+spring.datasource.db3.hikari.allowPoolSuspension=false
+```
+
+4.在启动类上添加引用
+```java
+@Import({DynamicDataSourceRegister.class})
+```
+
+5.代码中应用
+由于数据源动态切换是使用Aspect+注解完成的，所以调用时需要将Bean交给Spring的IOC容器管理。因为这样Spring才能通过AOP加强，触发我们的切换逻辑。
+```java
+Controller:
+@Resource
+private StudentService studentService;
+	
+@GetMapping("/fcn")
+public List<String> findCHNames() {
+	return studentService.findClickHouseColumnName();
+}
+
+Service:
+@Resource
+private JdbcTemplate jdbcTemplate;
+
+@TargetDataSource("db3")
+public List<String> findClickHouseColumnName() {
+	String sql = "show tables";
+	List<String> strings = jdbcTemplate.queryForList(sql, String.class);
+return strings;
+}
+
+```
+
+### 源码地址
+https://github.com/xieyucan/spring-boot-easy-connection-pool
+
+
+
+
+
+
+
