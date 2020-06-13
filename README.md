@@ -20,21 +20,40 @@
 	5. 代码逻辑简单，扩展自原生Spring接口
 	6. 代码注释详细，易于二次开发
 
+### 使用实例
+和该项目配置的[实例项目](https://github.com/xieyucan/easy-connection-pool-demo) 可以点击查看
+
+#### 在MyBatis中的用法
+演示项目 [easy-mybatis](https://github.com/xieyucan/easy-connection-pool-demo/tree/master/easy-mybatis)
+
+演示用例 [easy-mybatis-MyBatisApplicationTest](https://github.com/xieyucan/easy-connection-pool-demo/tree/master/easy-mybatis/src/test/java/com/xieahui/easy/mybatis)
+
+#### 在JPA中的用法
+演示项目 [easy-jpa](https://github.com/xieyucan/easy-connection-pool-demo/tree/master/easy-jpa)
+
+演示用例 [easy-jpa-JpaApplicationTest](https://github.com/xieyucan/easy-connection-pool-demo/blob/master/easy-jpa/src/test/java/com/xieahui/easy/jpa)
+
+#### 在JdbcTemplate中的用法
+演示项目 [easy-jdbctemplate](https://github.com/xieyucan/easy-connection-pool-demo/tree/master/easy-jdbctemplate)
+
+演示用例 [easy-jpa-JdbcTemplateApplicationTest](https://github.com/xieyucan/easy-connection-pool-demo/tree/master/easy-jdbctemplate/src/test/java/com/xieahui/easy/jdbctemplate)
+
+
 ### 使用说明
 插件是基于SpringBoot开发maven管理的，使用步骤
 
 1.添加插件maven依赖
 ```java
 <dependency>
-	<groupId>com.xh.springboot</groupId>
-	<artifactId>spring-boot-easy-connection-pool</artifactId>
-	<version>1.0-SNAPSHOT</version>
+    <groupId>com.xieahui.springboot</groupId>
+    <artifactId>spring-boot-easy-connection-pool</artifactId>
+    <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
 
 2.启动类中添加引用
 ```java
-@Import({DynamicDataSourceRegister.class})
+@Import({DynamicDataSourceRegister.class, DynamicDataSourceAspect.class})
 ```
 
 3.必要的连接属性配置
@@ -175,7 +194,7 @@ return strings;
 https://github.com/xieyucan/spring-boot-easy-connection-pool
 
 ### 后续更新说明
-如果这个插件使用的人较多，后面会增加动态读取数据库中的连接配置信息并添加链接管理界面及连接池管理信息。加油！
+如果这个插件使用的人较多，后面会增加动态读取数据库中的连接配置信息并添加链接管理界面及连接池管理信息。以上，如有问题可以邮件联系我。祝好！
 
 
 
