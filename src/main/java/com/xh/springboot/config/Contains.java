@@ -5,6 +5,39 @@ package com.xh.springboot.config;
  */
 public class Contains {
 
+    public static class DbTemplate {
+        /**
+         * mysql连接模板
+         * jdbc:mysql://ip:port/db?params
+         */
+        public static final String JDBC_MYSQL = "jdbc:mysql://%s/%s?%s";
+
+        /**
+         * oracle连接模板
+         * jdbc:oracle:thin:@ip:port:db
+         */
+        public static final String JDBC_ORACLE = "jdbc:oracle:thin:@%s:%s";
+
+        /**
+         * clickhouse连接模板
+         * jdbc:clickhouse://ip:port/db
+         */
+        public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://%s/%s";
+
+        /**
+         * sql-server连接模板
+         * jdbc:microsoft:sqlserver://ip:port;DatabaseName=db
+         */
+        public static final String JDBC_SQL_SERVER = "jdbc:microsoft:sqlserver://%s;DatabaseName=%s";
+
+        /**
+         * db2-连接模板
+         * jdbc:db2://ip:port/db
+         */
+        public static final String JDBC_DB2 = "jdbc:db2://%s/%s";
+
+    }
+
     /**
      * 获取数据源名key
      *
