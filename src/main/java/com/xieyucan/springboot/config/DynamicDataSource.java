@@ -1,4 +1,4 @@
-package com.xh.springboot.config;
+package com.xieyucan.springboot.config;
 
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 

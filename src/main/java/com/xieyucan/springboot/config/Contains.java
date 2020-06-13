@@ -1,4 +1,4 @@
-package com.xh.springboot.config;
+package com.xieyucan.springboot.config;
 
 /**
  * Created by xiehui1956(@)gmail.com on 2020/5/22

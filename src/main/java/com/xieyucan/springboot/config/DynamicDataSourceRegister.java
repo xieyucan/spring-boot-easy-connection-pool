@@ -1,4 +1,4 @@
-package com.xh.springboot.config;
+package com.xieyucan.springboot.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

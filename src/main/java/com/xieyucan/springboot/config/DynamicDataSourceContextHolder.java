@@ -1,4 +1,4 @@
-package com.xh.springboot.config;
+package com.xieyucan.springboot.config;
 
 import java.util.ArrayList;
 import java.util.List;

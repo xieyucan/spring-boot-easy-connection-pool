@@ -1,4 +1,4 @@
-package com.xh.springboot.annotation;
+package com.xieyucan.springboot.annotation;
 
 import java.lang.annotation.*;
 
