@@ -165,7 +165,7 @@ spring.datasource.db3.hikari.allowPoolSuspension=false
 
 4.在启动类上添加引用
 ```java
-@Import({DynamicDataSourceRegister.class})
+@Import({DynamicDataSourceRegister.class, DynamicDataSourceAspect.class})
 ```
 
 5.代码中应用
