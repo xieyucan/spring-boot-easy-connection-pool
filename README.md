@@ -51,9 +51,9 @@
 </dependency>
 ```
 
-2.启动类中添加引用
+2.在启动类上添加注解开启动态数据源
 ```java
-@Import({DynamicDataSourceRegister.class, DynamicDataSourceAspect.class})
+@EnableDynamicDataSource
 ```
 
 3.必要的连接属性配置
@@ -160,12 +160,7 @@ spring.datasource.db3.hikari.registerMbeans=false
 spring.datasource.db3.hikari.allowPoolSuspension=false
 ```
 
-4.在启动类上添加引用
-```java
-@Import({DynamicDataSourceRegister.class, DynamicDataSourceAspect.class})
-```
-
-5.代码中应用
+4.代码中应用
 由于数据源动态切换是使用Aspect+注解完成的，所以调用时需要将Bean交给Spring的IOC容器管理。只有这样Spring才能通过AOP加强，触发我们的切换逻辑。
 ```java
 Controller:
