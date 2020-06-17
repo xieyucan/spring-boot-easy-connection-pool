@@ -125,7 +125,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
     /**
      * 打印数据库表
      *
-     * @param dataSource
+     * @param dataSource 数据源
      */
     public void printDbTable(DataSource dataSource) {
         try {

@@ -26,6 +26,9 @@ public class DynamicDataSourceContextHolder {
 
     /**
      * 判断指定DataSource当前是否存在
+     *
+     * @param dataSourceId 数据源名
+     * @return 验证数据源是否初始化
      */
     public static boolean containsDataSource(String dataSourceId) {
         return dataSourceIds.contains(dataSourceId);

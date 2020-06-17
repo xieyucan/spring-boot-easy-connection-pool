@@ -8,7 +8,7 @@ public class Contains {
     /**
      * 获取数据源名key
      *
-     * @return
+     * @return 数据源key
      */
     public static String getDsNameKey() {
         return String.format("%s.%s", DB_SETTING_PREFIX, DB_NAME);
@@ -17,7 +17,7 @@ public class Contains {
     /**
      * 获取默认连接池类型
      *
-     * @return
+     * @return 连接池类型
      */
     public static String getDefaultType() {
         return getType("");
@@ -26,8 +26,8 @@ public class Contains {
     /**
      * 获取指定的连接池类型
      *
-     * @param dataSourceName
-     * @return
+     * @param dataSourceName 数据源名称
+     * @return 连接池类型
      */
     public static String getType(String dataSourceName) {
         return String.format(NAME_FORMAT, DB_SETTING_PREFIX, dataSourceName, DatasourceBaseProperty.TYPE);
@@ -36,7 +36,7 @@ public class Contains {
     /**
      * 获取默认驱动类
      *
-     * @return
+     * @return 驱动类
      */
     public static String getDefaultDriverClassName() {
         return getDriverClassName("");
@@ -45,8 +45,8 @@ public class Contains {
     /**
      * 获取指定驱动类
      *
-     * @param dataSourceDriverClassName
-     * @return
+     * @param dataSourceDriverClassName 驱动名
+     * @return 驱动类
      */
     public static String getDriverClassName(String dataSourceDriverClassName) {
         return String.format(NAME_FORMAT, DB_SETTING_PREFIX, dataSourceDriverClassName, DatasourceBaseProperty.DRIVER_CLASS_NAME);
@@ -55,7 +55,7 @@ public class Contains {
     /**
      * 获取默认连接
      *
-     * @return
+     * @return 默认连接
      */
     public static String getDefaultUrl() {
         return getUrl("");
@@ -64,8 +64,8 @@ public class Contains {
     /**
      * 获取指定连接
      *
-     * @param datasourceUrl
-     * @return
+     * @param datasourceUrl 连接URL
+     * @return 指定连接
      */
     public static String getUrl(String datasourceUrl) {
         return String.format(NAME_FORMAT, DB_SETTING_PREFIX, datasourceUrl, DatasourceBaseProperty.URL);
@@ -74,7 +74,7 @@ public class Contains {
     /**
      * 获取默认连接用户名
      *
-     * @return
+     * @return 连接用户名
      */
     public static String getDefaultUsername() {
         return getUsername("");
@@ -83,7 +83,8 @@ public class Contains {
     /**
      * 获取指定连接用户名
      *
-     * @return
+     * @param datasourceUsername 连接名
+     * @return 用户名
      */
     public static String getUsername(String datasourceUsername) {
         return String.format(NAME_FORMAT, DB_SETTING_PREFIX, datasourceUsername, DatasourceBaseProperty.USERNAME);
@@ -92,7 +93,7 @@ public class Contains {
     /**
      * 获取默认连接密码
      *
-     * @return
+     * @return 连接密码
      */
     public static String getDefaultPassword() {
         return getPassword("");
@@ -101,7 +102,8 @@ public class Contains {
     /**
      * 获取指定连接密码
      *
-     * @return
+     * @param password 密码
+     * @return 密码
      */
     public static String getPassword(String password) {
         return String.format(NAME_FORMAT, DB_SETTING_PREFIX, password, DatasourceBaseProperty.PASSWORD);
@@ -110,8 +112,8 @@ public class Contains {
     /**
      * 获取默认dsPrefix
      *
-     * @param fieldName
-     * @return
+     * @param fieldName 字段名
+     * @return dsPrefix
      */
     public static String getDefaultDsPoolPrefix(String fieldName) {
         return getDsPoolPrefix("", fieldName);
@@ -120,8 +122,9 @@ public class Contains {
     /**
      * 连接池前缀
      *
-     * @param dsName
-     * @return
+     * @param dsName 数据源名
+     * @param fieldName 字段名
+     * @return 连接池前缀
      */
     public static String getDsPoolPrefix(String dsName, String fieldName) {
         if (null != dsName && dsName.trim().length() > 0) {
