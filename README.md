@@ -47,7 +47,7 @@
 <dependency>
     <groupId>com.xieahui.springboot</groupId>
     <artifactId>spring-boot-easy-connection-pool</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-RELEASE</version>
 </dependency>
 ```
 
