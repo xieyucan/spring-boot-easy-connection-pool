@@ -51,7 +51,7 @@
         </dependency>
     </dependencies>
 
-    <!--<distributionManagement>
+    <distributionManagement>
         <repository>
             <id>snapshots</id>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
@@ -60,7 +60,7 @@
             <id>snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         </snapshotRepository>
-    </distributionManagement>-->
+    </distributionManagement>
 
     <build>
         <plugins>
