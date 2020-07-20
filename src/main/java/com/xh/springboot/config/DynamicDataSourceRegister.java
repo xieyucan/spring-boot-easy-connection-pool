@@ -1,19 +1,19 @@
 package com.xh.springboot.config;
 
+import com.xh.springboot.entity.DbEntity;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
@@ -26,6 +26,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,17 +37,20 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar, EnvironmentAware {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicDataSourceRegister.class);
-    private ConversionService conversionService = new DefaultConversionService();
-    private PropertyValues dataSourcePropertyValues;
 
     // 数据源
     private DataSource defaultDataSource;
     private Map<String, DataSource> customDataSources = new ConcurrentHashMap();
 
-    //加载多数据源配置
+    /**
+     * 加载多数据源配置
+     *
+     * @param env
+     */
     @Override
     public void setEnvironment(Environment env) {
         initDefaultDataSource(env);
+        initCustomDbDataSources();
         initCustomDataSources(env);
     }
 
@@ -72,7 +76,9 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
         System.out.println(defaultDataSource);
     }
 
-    //初始化更多数据源
+    /**
+     * 初始化更多数据源-读取配置文件
+     */
     private void initCustomDataSources(Environment environment) {
         String dsPrefixes = environment.getProperty(Contains.getDsNameKey());
         Assert.notNull(dsPrefixes, "DataSource Name Can Not Empty!");
@@ -80,6 +86,47 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
             DataSource dataSource = buildDataSource(dsPrefix, environment);
             customDataSources.put(dsPrefix, dataSource);
         });
+    }
+
+    /**
+     * 初始化更多数据源-读取数据库问价
+     */
+    private void initCustomDbDataSources() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(this.defaultDataSource);
+        List<DbEntity> entityList = queryDbEntityList(jdbcTemplate);
+        for (int i = 0; i < entityList.size(); i++) {
+            DbEntity dbEntity = entityList.get(i);
+            HikariConfig hikariConfig = buildHikariConfig(dbEntity);
+            DataSource hikariDataSource = new HikariDataSource(hikariConfig);
+            customDataSources.put(dbEntity.getPoolName(), hikariDataSource);
+        }
+    }
+
+    public HikariConfig buildHikariConfig(DbEntity dbEntity) {
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setDriverClassName(dbEntity.getDriverClassName());
+        hikariConfig.setJdbcUrl(dbEntity.getJdbcUrl());
+        hikariConfig.setPoolName(dbEntity.getPoolName());
+        hikariConfig.setUsername(dbEntity.getUsername());
+        hikariConfig.setPassword(dbEntity.getPassword());
+        hikariConfig.setMinimumIdle(dbEntity.getMinimumIdle());
+        hikariConfig.setMaximumPoolSize(dbEntity.getMaximumPoolSize());
+        hikariConfig.setConnectionTestQuery(dbEntity.getConnectionTestQuery());
+        return hikariConfig;
+    }
+
+    public List<DbEntity> queryDbEntityList(JdbcTemplate jdbcTemplate) {
+        return jdbcTemplate.query("select " +
+                        "driver_class_name AS driverClassName, " +
+                        "jdbc_url AS jdbcUrl, " +
+                        "pool_name AS poolName, " +
+                        "username AS username, " +
+                        "password AS password, " +
+                        "minimum_idle AS minimumIdle, " +
+                        "maximum_pool_size AS maximumPoolSize, " +
+                        "connection_test_query AS connectionTestQuery " +
+                        "from db_entity"
+                , new BeanPropertyRowMapper().newInstance(DbEntity.class));
     }
 
     @Override

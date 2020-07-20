@@ -6,7 +6,6 @@ package com.xh;
 public class MyClass {
 
     public static void main(String[] args) {
-        String temp = "%s%s%s";
-        System.out.println(String.format(temp, 1, 2, 3));
+        System.out.println(String.valueOf(System.currentTimeMillis()));
     }
 }
