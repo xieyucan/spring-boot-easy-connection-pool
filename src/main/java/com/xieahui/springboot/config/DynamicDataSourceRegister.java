@@ -1,4 +1,4 @@
-package com.xh.springboot.config;
+package com.xieahui.springboot.config;
 
 import com.xh.springboot.entity.DbEntity;
 import com.zaxxer.hikari.HikariConfig;
@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -60,20 +59,10 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
     private void initDefaultDataSource(Environment env) {
         // 读取主数据源
         DataSource hikariDataSource = buildDataSource("", env);
-        try {
-            Connection connection = hikariDataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement("show tables");
-            ResultSet executeQuery = preparedStatement.executeQuery();
-            ResultSetMetaData metaData = executeQuery.getMetaData();
-            while (executeQuery.next()) {
-                System.out.println(executeQuery.getString(1));
-            }
-        } catch (Exception throwAbles) {
-            throwAbles.printStackTrace();
-        }
-
+        logger.info("***Print-Tables-Start***:");
+        printDbTable(hikariDataSource);
+        logger.info("***Print-Tables-End***.\n");
         defaultDataSource = hikariDataSource;
-        System.out.println(defaultDataSource);
     }
 
     /**
@@ -84,6 +73,9 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
         Assert.notNull(dsPrefixes, "DataSource Name Can Not Empty!");
         Arrays.stream(dsPrefixes.split(",")).forEach(dsPrefix -> {
             DataSource dataSource = buildDataSource(dsPrefix, environment);
+            logger.info("***Print-Tables-Start***:");
+            printDbTable(dataSource);
+            logger.info("***Print-Tables-End***.\n");
             customDataSources.put(dsPrefix, dataSource);
         });
     }
@@ -180,5 +172,23 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 
         DataSource hikariDataSource = new HikariDataSource(hikariConfig);
         return hikariDataSource;
+    }
+
+    /**
+     * 打印数据库表
+     *
+     * @param dataSource 数据源
+     */
+    public void printDbTable(DataSource dataSource) {
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement("show tables");
+            ResultSet executeQuery = preparedStatement.executeQuery();
+            while (executeQuery.next()) {
+                logger.info(executeQuery.getString(1));
+            }
+        } catch (Exception throwAbles) {
+            throwAbles.printStackTrace();
+        }
     }
 }

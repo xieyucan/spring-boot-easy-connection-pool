@@ -2,43 +2,62 @@
 ### 背景
 #### 数据部后端服务特点：
 	1. 需要对接多种数据源
-	2. 数据源存储大量数据
+	2. 数据源中存储的数据量较大
 	3. 需要为不同的业务部门、数据看板、数据报表提供数据服务
 #### 数据部后端服务痛点：
 	1. 服务中多数据源配置繁琐、切换逻辑复杂
-	2. 不适用连接池，系统性能低、容易拉垮数据源
-	3. 使用连接池，多数据源多连接池配置逻辑复杂容易出错
-	4. 大型系统中由于数据源过多数据源会集中在数据库中管理，这样更加需要动态太管理配置数据源
+	2. 使用连接池，多数据源多连接池配置逻辑复杂易出错；不使用连接池，系统性能较低且容易拉垮数据源
+	3. 大型系统中由于数据源过多数据源会集中在数据库中管理，这样更加需要动态管理配置数据源
 ### 插件简介
-基于上述项目背景统一封装了动态多数据源连接池配置插件，连接池使用的是业界号称最快的Hikari,话说这个连接池究竟有多快？快到SpringBoot2默认的连接池都换成他了。只需要在项目中引入插件，在属性文件中添加必要的数据源连接配置信息及连接池参数，就可以通过注解动态切换数据源、无论是读写分离、主从配置还是一主多从的数据源都可以通过配置动态生成DataSource连接池。
-项目中各部分注释比较详细，对于二次开发扩展也非常方便，这么好的插件有什么理由不去使用呢。
+基于上述项目背景，统一封装了多数据源连接池动态化配置插件，连接池使用的是业界号称"最快的"Hikari（SpringBoot2默认的连接池）；只需在项目中引入插件，在属性文件中添加必要的数据源连接配置信息及连接池参数，就可以通过注解进而动态切换数据源；无论是读写分离、主从配置还是一主多从的数据源均可通过此动态配置生成DataSource连接池。
+项目中各部分注释比较详细，对于二次开发扩展也非常方便，同时在启动过程会打印出详细的连接池配置流程以及连接池中的表信息：
+
+![启动图片](https://github.com/xieyucan/easy-connection-pool-demo/blob/master/images/start.jpeg)
+
 ### 插件功能特点
 	1. 动态支持多数据源连接池配置
 	2. 理论上支持无限多个数据源连接池
 	3. 通过注解切换数据源
-	4. 非常适用数据库读写分离、一主多从等业务场景
-	5. 代码逻辑简单，扩展自原生Spring接口
-	6. 代码注释详细，易于二次开发
+	4. 对于数据库读写分离、一主多从等业务场景非常适用
+	5. 代码逻辑简单，扩展来自原生Spring接口；注释详细，易于二次开发
+### 使用实例
+和该项目配置的[实例项目](https://github.com/xieyucan/easy-connection-pool-demo) 可以点击查看
+
+#### 在MyBatis中的用法
+演示项目 [easy-mybatis](https://github.com/xieyucan/easy-connection-pool-demo/tree/master/easy-mybatis)
+
+演示用例 [easy-mybatis-MyBatisApplicationTest](https://github.com/xieyucan/easy-connection-pool-demo/tree/master/easy-mybatis/src/test/java/com/xieahui/easy/mybatis)
+
+#### 在JPA中的用法
+演示项目 [easy-jpa](https://github.com/xieyucan/easy-connection-pool-demo/tree/master/easy-jpa)
+
+演示用例 [easy-jpa-JpaApplicationTest](https://github.com/xieyucan/easy-connection-pool-demo/blob/master/easy-jpa/src/test/java/com/xieahui/easy/jpa)
+
+#### 在JdbcTemplate中的用法
+演示项目 [easy-jdbctemplate](https://github.com/xieyucan/easy-connection-pool-demo/tree/master/easy-jdbctemplate)
+
+演示用例 [easy-jpa-JdbcTemplateApplicationTest](https://github.com/xieyucan/easy-connection-pool-demo/tree/master/easy-jdbctemplate/src/test/java/com/xieahui/easy/jdbctemplate)
+
 
 ### 使用说明
-插件是基于SpringBoot开发maven管理的，使用步骤
+插件是基于SpringBoot开发maven管理的，使用步骤如下：
 
 1.添加插件maven依赖
 ```java
 <dependency>
-	<groupId>com.xh.springboot</groupId>
-	<artifactId>spring-boot-easy-connection-pool</artifactId>
-	<version>1.0-SNAPSHOT</version>
+    <groupId>com.xieahui.springboot</groupId>
+    <artifactId>spring-boot-easy-connection-pool</artifactId>
+    <version>1.0-RELEASE</version>
 </dependency>
 ```
 
-2.启动类中添加引用
+2.在启动类上添加注解开启动态数据源
 ```java
-@Import({DynamicDataSourceRegister.class})
+@EnableDynamicDataSource
 ```
 
 3.必要的连接属性配置
-说明：spring.datasource.names属性配置数据资源名,如果连接的数据源没有那么多请记得在这里移除掉。默认数据源使用了JPA，使用过的持久层技术有JdbcUtils,Hibernate,IBatis和MyBatis,JdbcTemplate,Jpa。现在写项目最常用的持久层技术是JPA+JdbcTemplate，持久层技术方案众多、好坏只有自己去品。能解决业务场景问题、开发效率高用的开心就好。
+说明：spring.datasource.names属性配置数据资源名（如果连接的数据源较少，请在此处移除掉）。默认数据源使用了JPA，使用的持久层技术有JdbcUtils,Hibernate,IBatis和MyBatis,JdbcTemplate,Jpa（现有项目最常用的持久层技术是JPA+JdbcTemplate；持久层技术方案众多，好坏只有自己去品）。能解决业务场景问题、开发效率高用的开心就好。
 
 ```java
 server.port=8080
@@ -141,13 +160,8 @@ spring.datasource.db3.hikari.registerMbeans=false
 spring.datasource.db3.hikari.allowPoolSuspension=false
 ```
 
-4.在启动类上添加引用
-```java
-@Import({DynamicDataSourceRegister.class})
-```
-
-5.代码中应用
-由于数据源动态切换是使用Aspect+注解完成的，所以调用时需要将Bean交给Spring的IOC容器管理。因为这样Spring才能通过AOP加强，触发我们的切换逻辑。
+4.代码中应用
+由于数据源动态切换是使用Aspect+注解完成的，所以调用时需要将Bean交给Spring的IOC容器管理。只有这样Spring才能通过AOP加强，触发我们的切换逻辑。
 ```java
 Controller:
 @Resource
@@ -175,7 +189,7 @@ return strings;
 https://github.com/xieyucan/spring-boot-easy-connection-pool
 
 ### 后续更新说明
-如果这个插件使用的人较多，后面会增加动态读取数据库中的连接配置信息并添加链接管理界面及连接池管理信息。加油！
+如此插件使用的人较多，后续将会增加动态读取数据库中的连接配置信息并添加链接管理界面及连接池管理信息。以上，如有问题可以邮件联系我。祝好！
 
 
 

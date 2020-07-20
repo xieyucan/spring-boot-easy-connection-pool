@@ -1,4 +1,4 @@
-package com.xh.springboot.config;
+package com.xieahui.springboot.config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,9 +8,9 @@ import java.util.List;
  */
 public class DynamicDataSourceContextHolder {
 
-    private static final ThreadLocal<String> contextHolder = new ThreadLocal<>();
+    private static final ThreadLocal<String> contextHolder = new ThreadLocal();
 
-    public static List<String> dataSourceIds = new ArrayList<>();
+    public static List<String> dataSourceIds = new ArrayList();
 
     public static void setDataSourceType(String dataSourceType) {
         contextHolder.set(dataSourceType);
@@ -26,6 +26,9 @@ public class DynamicDataSourceContextHolder {
 
     /**
      * 判断指定DataSource当前是否存在
+     *
+     * @param dataSourceId 数据源名
+     * @return 验证数据源是否初始化
      */
     public static boolean containsDataSource(String dataSourceId) {
         return dataSourceIds.contains(dataSourceId);
