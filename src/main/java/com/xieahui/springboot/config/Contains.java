@@ -48,6 +48,18 @@ public class Contains {
     }
 
     /**
+     * 获取是否从数据库动态加载连接池配置
+     * true: 加载、false: 不加载
+     * default: false
+     *
+     * @return 数据源key
+     */
+    public static String getDbOpen() {
+        return String.format("%s.%s", DB_SETTING_PREFIX, DB_OPEN);
+    }
+
+
+    /**
      * 获取默认连接池类型
      *
      * @return 连接池类型
@@ -155,7 +167,7 @@ public class Contains {
     /**
      * 连接池前缀
      *
-     * @param dsName 数据源名
+     * @param dsName    数据源名
      * @param fieldName 字段名
      * @return 连接池前缀
      */
@@ -170,6 +182,11 @@ public class Contains {
      * 数据库名
      */
     private static String DB_NAME = "names";
+
+    /**
+     * 是否开启数据源配置
+     */
+    private static String DB_OPEN = ".db.open";
 
     /**
      * 属性名构建格式

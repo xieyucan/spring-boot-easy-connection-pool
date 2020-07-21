@@ -1,4 +1,4 @@
-package com.xh.springboot.entity;
+package com.xieahui.springboot.entity;
 
 import org.springframework.util.StringUtils;
 
@@ -8,6 +8,11 @@ import java.io.Serializable;
  * Created by xiehui1956(@)gmail.com on 2020/7/20
  */
 public class DbEntity implements Serializable {
+
+    /**
+     * 数据库主键
+     */
+    private long id;
 
     /**
      * 驱动类
@@ -60,6 +65,14 @@ public class DbEntity implements Serializable {
      * connection_test_query
      */
     private String connectionTestQuery = "SELECT 1";
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getDriverClassName() {
         return driverClassName;

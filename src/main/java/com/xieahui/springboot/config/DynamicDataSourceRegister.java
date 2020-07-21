@@ -1,6 +1,6 @@
 package com.xieahui.springboot.config;
 
-import com.xh.springboot.entity.DbEntity;
+import com.xieahui.springboot.entity.DbEntity;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
@@ -49,7 +49,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
     @Override
     public void setEnvironment(Environment env) {
         initDefaultDataSource(env);
-        initCustomDbDataSources();
+        initCustomDbDataSources(env);
         initCustomDataSources(env);
     }
 
@@ -58,11 +58,12 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
      */
     private void initDefaultDataSource(Environment env) {
         // 读取主数据源
-        DataSource hikariDataSource = buildDataSource("", env);
+        DataSource dataSource = buildDataSource("", env);
+        logger.info("*** Create DataSource Default Success! ***");
         logger.info("***Print-Tables-Start***:");
-        printDbTable(hikariDataSource);
+        printDbTable(dataSource);
         logger.info("***Print-Tables-End***.\n");
-        defaultDataSource = hikariDataSource;
+        defaultDataSource = dataSource;
     }
 
     /**
@@ -73,6 +74,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
         Assert.notNull(dsPrefixes, "DataSource Name Can Not Empty!");
         Arrays.stream(dsPrefixes.split(",")).forEach(dsPrefix -> {
             DataSource dataSource = buildDataSource(dsPrefix, environment);
+            logger.info("*** Create DataSource {} Success! ***", dsPrefix);
             logger.info("***Print-Tables-Start***:");
             printDbTable(dataSource);
             logger.info("***Print-Tables-End***.\n");
@@ -82,15 +84,22 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 
     /**
      * 初始化更多数据源-读取数据库问价
+     * spring.datasource.db.open=true
      */
-    private void initCustomDbDataSources() {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(this.defaultDataSource);
-        List<DbEntity> entityList = queryDbEntityList(jdbcTemplate);
-        for (int i = 0; i < entityList.size(); i++) {
-            DbEntity dbEntity = entityList.get(i);
-            HikariConfig hikariConfig = buildHikariConfig(dbEntity);
-            DataSource hikariDataSource = new HikariDataSource(hikariConfig);
-            customDataSources.put(dbEntity.getPoolName(), hikariDataSource);
+    private void initCustomDbDataSources(Environment environment) {
+        if (environment.getProperty(Contains.getDbOpen(), Boolean.class) == null ? false : true) {
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(this.defaultDataSource);
+            List<DbEntity> entityList = queryDbEntityList(jdbcTemplate);
+            for (int i = 0; i < entityList.size(); i++) {
+                DbEntity dbEntity = entityList.get(i);
+                HikariConfig hikariConfig = buildHikariConfig(dbEntity);
+                DataSource dataSource = new HikariDataSource(hikariConfig);
+                logger.info("*** Create DataSource {} Success! ***", dbEntity.getPoolName());
+                logger.info("***Print-Tables-Start***:");
+                printDbTable(dataSource);
+                logger.info("***Print-Tables-End***.\n");
+                customDataSources.put(dbEntity.getPoolName(), dataSource);
+            }
         }
     }
 

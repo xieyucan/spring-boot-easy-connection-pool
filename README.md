@@ -188,10 +188,83 @@ return strings;
 ### 源码地址
 https://github.com/xieyucan/spring-boot-easy-connection-pool
 
-### 后续更新说明
-如此插件使用的人较多，后续将会增加动态读取数据库中的连接配置信息并添加链接管理界面及连接池管理信息。以上，如有问题可以邮件联系我。祝好！
+### V1.0.1 - 更新说明
+新增从默认数据库中获取数据源连接信息，使用说明。
+#### 1. 开启从数据库中加载数据源属性设置：
+```javascript
+spring.datasource.db.open=true
+```
 
+#### 2. 创建数据库数据源表
+```jql
+CREATE TABLE `easy_pool_demo`.`db_entity` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `driver_class_name` VARCHAR(45) NULL DEFAULT 'com.mysql.cj.jdbc.Driver',
+  `jdbc_url` VARCHAR(45) NULL,
+  `pool_name` VARCHAR(45) NULL,
+  `username` VARCHAR(45) NULL,
+  `password` VARCHAR(45) NULL,
+  `minimum_idle` INT NULL DEFAULT 5,
+  `maximum_pool_size` INT NULL DEFAULT 10,
+  `connection_test_query` VARCHAR(45) NULL DEFAULT 'SELECT 1',
+  PRIMARY KEY (`id`));
+```
 
+该表结构在resources/script/db_entity.sql文件中
 
+#### 3. 添加动态数据源注解
+设置在执行的方法上：
+```java
+@TargetDataSource
+```
 
+#### 4. 动态指定数据源
+```java
+// DynamicDbSource.set("db3");
 
+@TargetDataSource
+public List<MyDb3> findAll() throws InterruptedException {
+    //动态数据源设置
+    DynamicDbSource.set("db3");
+    TimeUnit.SECONDS.sleep(60);
+    return myDb3Dao.findAll();
+}
+```
+
+PS: DynamicDbSource.set("连接池名称"),可以根据自己的实际业务逻辑设置数据源名称。例如我们需要根据请求的pk获取当前连接对应的数据源配置，
+获取到名字后在这里设置为数据源名字即可。
+
+### 启动信息
+系统优先使用注解方法上的属性配置，注解方法上没有配置的情况下会读取DynamicDbSource设置的数据源配置。系统启动时会日志中会打印出当前创建连接
+池的情况，以及连接池中的数据表。
+```javascript
+2020-07-21 12:35:38.639  INFO 27348 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariCP1 - Starting...
+2020-07-21 12:35:38.888  INFO 27348 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariCP1 - Start completed.
+2020-07-21 12:35:38.889  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource Default Success! ***
+2020-07-21 12:35:38.889  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
+2020-07-21 12:35:38.911  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : db
+2020-07-21 12:35:38.912  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : db_entity
+2020-07-21 12:35:38.912  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : hibernate_sequence
+2020-07-21 12:35:38.912  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : student
+2020-07-21 12:35:38.912  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
+
+2020-07-21 12:35:38.949  INFO 27348 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : db3 - Starting...
+2020-07-21 12:35:38.954  INFO 27348 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : db3 - Start completed.
+2020-07-21 12:35:38.954  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource db3 Success! ***
+2020-07-21 12:35:38.954  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
+2020-07-21 12:35:38.956  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : my_db3
+2020-07-21 12:35:38.956  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
+
+2020-07-21 12:35:38.962  WARN 27348 --- [  restartedMain] com.zaxxer.hikari.HikariConfig           : HikariCP2 - idleTimeout has been set but has no effect because the pool is operating as a fixed size pool.
+2020-07-21 12:35:38.962  INFO 27348 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariCP2 - Starting...
+2020-07-21 12:35:38.967  INFO 27348 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariCP2 - Start completed.
+2020-07-21 12:35:38.967  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource db1 Success! ***
+2020-07-21 12:35:38.967  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
+2020-07-21 12:35:38.969  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : hibernate_sequence
+2020-07-21 12:35:38.969  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : student
+2020-07-21 12:35:38.969  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : teacher
+2020-07-21 12:35:38.969  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : user
+2020-07-21 12:35:38.970  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
+
+2020-07-21 12:35:39.658  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : Dynamic DataSource Registry
+```

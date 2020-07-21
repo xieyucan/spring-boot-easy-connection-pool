@@ -2,6 +2,7 @@ package com.xieahui.springboot.aspect;
 
 import com.xieahui.springboot.annotation.TargetDataSource;
 import com.xieahui.springboot.config.DynamicDataSourceContextHolder;
+import com.xieahui.springboot.config.DynamicDbSource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 
 /**
@@ -27,19 +29,21 @@ public class DynamicDataSourceAspect {
     @Before("@annotation(targetDataSource)")
     public void changeDataSource(JoinPoint point, TargetDataSource targetDataSource) {
         String dsName = targetDataSource.value();
+        String dataSourceName = DynamicDbSource.get();
+        dsName = StringUtils.isEmpty(dsName) ? dataSourceName : dsName;
         if (!DynamicDataSourceContextHolder.containsDataSource(dsName)) {
             logger.error("DataSource [{}] not existing, Used default datasource [{}]", targetDataSource.value(), point.getSignature());
         } else {
             logger.debug("Use DataSource name = [{}] , signature = [{}]", dsName, point.getSignature());
             DynamicDataSourceContextHolder.setDataSourceType(dsName);
         }
-
     }
 
     @After("@annotation(targetDataSource)")
     public void restoreDataSource(JoinPoint point, TargetDataSource targetDataSource) {
         logger.debug("Revert DataSource = [{}] ,  signature = [{}]", targetDataSource.value(), point.getSignature());
         DynamicDataSourceContextHolder.clearDataSourceType();
+        DynamicDbSource.remove();
     }
 
 }
