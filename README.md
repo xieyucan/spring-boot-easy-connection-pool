@@ -234,6 +234,11 @@ public List<MyDb3> findAll() throws InterruptedException {
 PS: DynamicDbSource.set("连接池名称"),可以根据自己的实际业务逻辑设置数据源名称。例如我们需要根据请求的pk获取当前连接对应的数据源配置，
 获取到名字后在这里设置为数据源名字即可。
 
+#### 5. 实例地址
+```javascript
+https://github.com/xieyucan/easy-connection-pool-demo/blob/master/easy-jdbctemplate/src/main/java/com/xieahui/easy/jdbctemplate/service/MyDb3Service.java
+```
+
 ### 启动信息
 系统优先使用注解方法上的属性配置，注解方法上没有配置的情况下会读取DynamicDbSource设置的数据源配置。系统启动时会日志中会打印出当前创建连接
 池的情况，以及连接池中的数据表。
