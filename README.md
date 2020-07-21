@@ -23,6 +23,93 @@
 ### 使用实例
 和该项目配置的[实例项目](https://github.com/xieyucan/easy-connection-pool-demo) 可以点击查看
 
+### V1.0.1 - 更新说明
+新增从默认数据库中获取数据源连接信息，使用说明。
+#### 1. 开启从数据库中加载数据源属性设置：
+```javascript
+spring.datasource.db.open=true
+```
+
+#### 2. 创建数据库数据源表
+```jql
+CREATE TABLE `easy_pool_demo`.`db_entity` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `driver_class_name` VARCHAR(45) NULL DEFAULT 'com.mysql.cj.jdbc.Driver',
+  `jdbc_url` VARCHAR(45) NULL,
+  `pool_name` VARCHAR(45) NULL,
+  `username` VARCHAR(45) NULL,
+  `password` VARCHAR(45) NULL,
+  `minimum_idle` INT NULL DEFAULT 5,
+  `maximum_pool_size` INT NULL DEFAULT 10,
+  `connection_test_query` VARCHAR(45) NULL DEFAULT 'SELECT 1',
+  PRIMARY KEY (`id`));
+```
+
+该表结构在resources/script/db_entity.sql文件中
+
+#### 3. 添加动态数据源注解
+设置在执行的方法上：
+```java
+@TargetDataSource
+```
+
+#### 4. 动态指定数据源
+```java
+// DynamicDbSource.set("db3");
+
+@TargetDataSource
+public List<MyDb3> findAll() throws InterruptedException {
+    //动态数据源设置
+    DynamicDbSource.set("db3");
+    TimeUnit.SECONDS.sleep(60);
+    return myDb3Dao.findAll();
+}
+```
+
+PS: DynamicDbSource.set("连接池名称"),可以根据自己的实际业务逻辑设置数据源名称。例如我们需要根据请求的pk获取当前连接对应的数据源配置，
+获取到名字后在这里设置为数据源名字即可。
+
+#### 5. 实例地址
+```javascript
+https://github.com/xieyucan/easy-connection-pool-demo/blob/master/easy-jdbctemplate/src/main/java/com/xieahui/easy/jdbctemplate/service/MyDb3Service.java
+```
+
+### 启动信息
+系统优先使用注解方法上的属性配置，注解方法上没有配置的情况下会读取DynamicDbSource设置的数据源配置。系统启动时会日志中会打印出当前创建连接
+池的情况，以及连接池中的数据表。
+```javascript
+com.zaxxer.hikari.HikariDataSource       : HikariCP1 - Starting...
+com.zaxxer.hikari.HikariDataSource       : HikariCP1 - Start completed.
+c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource Default Success! ***
+c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
+c.x.s.config.DynamicDataSourceRegister   : db
+c.x.s.config.DynamicDataSourceRegister   : db_entity
+c.x.s.config.DynamicDataSourceRegister   : hibernate_sequence
+c.x.s.config.DynamicDataSourceRegister   : student
+c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
+
+com.zaxxer.hikari.HikariDataSource       : db3 - Starting...
+com.zaxxer.hikari.HikariDataSource       : db3 - Start completed.
+c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource db3 Success! ***
+c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
+c.x.s.config.DynamicDataSourceRegister   : my_db3
+c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
+
+com.zaxxer.hikari.HikariConfig           : HikariCP2 - idleTimeout has been set but has no effect because the pool is operating as a fixed size pool.
+com.zaxxer.hikari.HikariDataSource       : HikariCP2 - Starting...
+com.zaxxer.hikari.HikariDataSource       : HikariCP2 - Start completed.
+c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource db1 Success! ***
+c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
+c.x.s.config.DynamicDataSourceRegister   : hibernate_sequence
+c.x.s.config.DynamicDataSourceRegister   : student
+c.x.s.config.DynamicDataSourceRegister   : teacher
+c.x.s.config.DynamicDataSourceRegister   : user
+c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
+
+c.x.s.config.DynamicDataSourceRegister   : Dynamic DataSource Registry
+```
+
+
 #### 在MyBatis中的用法
 演示项目 [easy-mybatis](https://github.com/xieyucan/easy-connection-pool-demo/tree/master/easy-mybatis)
 
@@ -188,88 +275,3 @@ return strings;
 ### 源码地址
 https://github.com/xieyucan/spring-boot-easy-connection-pool
 
-### V1.0.1 - 更新说明
-新增从默认数据库中获取数据源连接信息，使用说明。
-#### 1. 开启从数据库中加载数据源属性设置：
-```javascript
-spring.datasource.db.open=true
-```
-
-#### 2. 创建数据库数据源表
-```jql
-CREATE TABLE `easy_pool_demo`.`db_entity` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `driver_class_name` VARCHAR(45) NULL DEFAULT 'com.mysql.cj.jdbc.Driver',
-  `jdbc_url` VARCHAR(45) NULL,
-  `pool_name` VARCHAR(45) NULL,
-  `username` VARCHAR(45) NULL,
-  `password` VARCHAR(45) NULL,
-  `minimum_idle` INT NULL DEFAULT 5,
-  `maximum_pool_size` INT NULL DEFAULT 10,
-  `connection_test_query` VARCHAR(45) NULL DEFAULT 'SELECT 1',
-  PRIMARY KEY (`id`));
-```
-
-该表结构在resources/script/db_entity.sql文件中
-
-#### 3. 添加动态数据源注解
-设置在执行的方法上：
-```java
-@TargetDataSource
-```
-
-#### 4. 动态指定数据源
-```java
-// DynamicDbSource.set("db3");
-
-@TargetDataSource
-public List<MyDb3> findAll() throws InterruptedException {
-    //动态数据源设置
-    DynamicDbSource.set("db3");
-    TimeUnit.SECONDS.sleep(60);
-    return myDb3Dao.findAll();
-}
-```
-
-PS: DynamicDbSource.set("连接池名称"),可以根据自己的实际业务逻辑设置数据源名称。例如我们需要根据请求的pk获取当前连接对应的数据源配置，
-获取到名字后在这里设置为数据源名字即可。
-
-#### 5. 实例地址
-```javascript
-https://github.com/xieyucan/easy-connection-pool-demo/blob/master/easy-jdbctemplate/src/main/java/com/xieahui/easy/jdbctemplate/service/MyDb3Service.java
-```
-
-### 启动信息
-系统优先使用注解方法上的属性配置，注解方法上没有配置的情况下会读取DynamicDbSource设置的数据源配置。系统启动时会日志中会打印出当前创建连接
-池的情况，以及连接池中的数据表。
-```javascript
-com.zaxxer.hikari.HikariDataSource       : HikariCP1 - Starting...
-com.zaxxer.hikari.HikariDataSource       : HikariCP1 - Start completed.
-c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource Default Success! ***
-c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
-c.x.s.config.DynamicDataSourceRegister   : db
-c.x.s.config.DynamicDataSourceRegister   : db_entity
-c.x.s.config.DynamicDataSourceRegister   : hibernate_sequence
-c.x.s.config.DynamicDataSourceRegister   : student
-c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
-
-com.zaxxer.hikari.HikariDataSource       : db3 - Starting...
-com.zaxxer.hikari.HikariDataSource       : db3 - Start completed.
-c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource db3 Success! ***
-c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
-c.x.s.config.DynamicDataSourceRegister   : my_db3
-c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
-
-com.zaxxer.hikari.HikariConfig           : HikariCP2 - idleTimeout has been set but has no effect because the pool is operating as a fixed size pool.
-com.zaxxer.hikari.HikariDataSource       : HikariCP2 - Starting...
-com.zaxxer.hikari.HikariDataSource       : HikariCP2 - Start completed.
-c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource db1 Success! ***
-c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
-c.x.s.config.DynamicDataSourceRegister   : hibernate_sequence
-c.x.s.config.DynamicDataSourceRegister   : student
-c.x.s.config.DynamicDataSourceRegister   : teacher
-c.x.s.config.DynamicDataSourceRegister   : user
-c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
-
-c.x.s.config.DynamicDataSourceRegister   : Dynamic DataSource Registry
-```
