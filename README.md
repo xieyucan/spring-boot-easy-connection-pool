@@ -238,33 +238,33 @@ PS: DynamicDbSource.set("连接池名称"),可以根据自己的实际业务逻�
 系统优先使用注解方法上的属性配置，注解方法上没有配置的情况下会读取DynamicDbSource设置的数据源配置。系统启动时会日志中会打印出当前创建连接
 池的情况，以及连接池中的数据表。
 ```javascript
-2020-07-21 12:35:38.639  INFO 27348 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariCP1 - Starting...
-2020-07-21 12:35:38.888  INFO 27348 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariCP1 - Start completed.
-2020-07-21 12:35:38.889  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource Default Success! ***
-2020-07-21 12:35:38.889  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
-2020-07-21 12:35:38.911  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : db
-2020-07-21 12:35:38.912  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : db_entity
-2020-07-21 12:35:38.912  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : hibernate_sequence
-2020-07-21 12:35:38.912  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : student
-2020-07-21 12:35:38.912  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
+com.zaxxer.hikari.HikariDataSource       : HikariCP1 - Starting...
+com.zaxxer.hikari.HikariDataSource       : HikariCP1 - Start completed.
+c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource Default Success! ***
+c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
+c.x.s.config.DynamicDataSourceRegister   : db
+c.x.s.config.DynamicDataSourceRegister   : db_entity
+c.x.s.config.DynamicDataSourceRegister   : hibernate_sequence
+c.x.s.config.DynamicDataSourceRegister   : student
+c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
 
-2020-07-21 12:35:38.949  INFO 27348 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : db3 - Starting...
-2020-07-21 12:35:38.954  INFO 27348 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : db3 - Start completed.
-2020-07-21 12:35:38.954  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource db3 Success! ***
-2020-07-21 12:35:38.954  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
-2020-07-21 12:35:38.956  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : my_db3
-2020-07-21 12:35:38.956  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
+com.zaxxer.hikari.HikariDataSource       : db3 - Starting...
+com.zaxxer.hikari.HikariDataSource       : db3 - Start completed.
+c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource db3 Success! ***
+c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
+c.x.s.config.DynamicDataSourceRegister   : my_db3
+c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
 
-2020-07-21 12:35:38.962  WARN 27348 --- [  restartedMain] com.zaxxer.hikari.HikariConfig           : HikariCP2 - idleTimeout has been set but has no effect because the pool is operating as a fixed size pool.
-2020-07-21 12:35:38.962  INFO 27348 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariCP2 - Starting...
-2020-07-21 12:35:38.967  INFO 27348 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariCP2 - Start completed.
-2020-07-21 12:35:38.967  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource db1 Success! ***
-2020-07-21 12:35:38.967  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
-2020-07-21 12:35:38.969  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : hibernate_sequence
-2020-07-21 12:35:38.969  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : student
-2020-07-21 12:35:38.969  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : teacher
-2020-07-21 12:35:38.969  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : user
-2020-07-21 12:35:38.970  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
+com.zaxxer.hikari.HikariConfig           : HikariCP2 - idleTimeout has been set but has no effect because the pool is operating as a fixed size pool.
+com.zaxxer.hikari.HikariDataSource       : HikariCP2 - Starting...
+com.zaxxer.hikari.HikariDataSource       : HikariCP2 - Start completed.
+c.x.s.config.DynamicDataSourceRegister   : *** Create DataSource db1 Success! ***
+c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-Start***:
+c.x.s.config.DynamicDataSourceRegister   : hibernate_sequence
+c.x.s.config.DynamicDataSourceRegister   : student
+c.x.s.config.DynamicDataSourceRegister   : teacher
+c.x.s.config.DynamicDataSourceRegister   : user
+c.x.s.config.DynamicDataSourceRegister   : ***Print-Tables-End***.
 
-2020-07-21 12:35:39.658  INFO 27348 --- [  restartedMain] c.x.s.config.DynamicDataSourceRegister   : Dynamic DataSource Registry
+c.x.s.config.DynamicDataSourceRegister   : Dynamic DataSource Registry
 ```
