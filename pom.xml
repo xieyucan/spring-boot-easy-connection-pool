@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.xieahui.springboot</groupId>
     <artifactId>spring-boot-easy-connection-pool</artifactId>
-    <version>1.0-RELEASE</version>
+    <version>1.0.1-RELEASE</version>
     <packaging>jar</packaging>
     <url>https://github.com/xieyucan/spring-boot-easy-connection-pool</url>
     <licenses>
