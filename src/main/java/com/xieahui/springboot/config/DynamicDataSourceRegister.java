@@ -14,7 +14,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.beans.PropertyDescriptor;
@@ -71,15 +71,16 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
      */
     private void initCustomDataSources(Environment environment) {
         String dsPrefixes = environment.getProperty(Contains.getDsNameKey());
-        Assert.notNull(dsPrefixes, "DataSource Name Can Not Empty!");
-        Arrays.stream(dsPrefixes.split(",")).forEach(dsPrefix -> {
-            DataSource dataSource = buildDataSource(dsPrefix, environment);
-            logger.info("*** Create DataSource {} Success! ***", dsPrefix);
-            logger.info("***Print-Tables-Start***:");
-            printDbTable(dataSource);
-            logger.info("***Print-Tables-End***.\n");
-            customDataSources.put(dsPrefix, dataSource);
-        });
+        if (!StringUtils.isEmpty(dsPrefixes)) {
+            Arrays.stream(dsPrefixes.split(",")).forEach(dsPrefix -> {
+                DataSource dataSource = buildDataSource(dsPrefix, environment);
+                logger.info("*** Create DataSource {} Success! ***", dsPrefix);
+                logger.info("***Print-Tables-Start***:");
+                printDbTable(dataSource);
+                logger.info("***Print-Tables-End***.\n");
+                customDataSources.put(dsPrefix, dataSource);
+            });
+        }
     }
 
     /**
