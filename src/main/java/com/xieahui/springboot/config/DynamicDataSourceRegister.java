@@ -1,6 +1,5 @@
 package com.xieahui.springboot.config;
 
-import com.xieahui.springboot.entity.DbEntity;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
@@ -12,7 +11,6 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.StringUtils;
 
@@ -23,10 +21,7 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -90,45 +85,61 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
     private void initCustomDbDataSources(Environment environment) {
         if (environment.getProperty(Contains.getDbOpen(), Boolean.class) == null ? false : true) {
             JdbcTemplate jdbcTemplate = new JdbcTemplate(this.defaultDataSource);
-            List<DbEntity> entityList = queryDbEntityList(jdbcTemplate);
+            List<Map<String, Object>> entityList = queryDbEntityList(jdbcTemplate);
             for (int i = 0; i < entityList.size(); i++) {
-                DbEntity dbEntity = entityList.get(i);
+                Map<String, Object> dbEntity = entityList.get(i);
                 HikariConfig hikariConfig = buildHikariConfig(dbEntity);
                 DataSource dataSource = new HikariDataSource(hikariConfig);
-                logger.info("*** Create DataSource {} Success! ***", dbEntity.getPoolName());
+                logger.info("*** Create DataSource {} Success! ***", dbEntity.get("pool_name"));
                 logger.info("***Print-Tables-Start***:");
                 printDbTable(dataSource);
                 logger.info("***Print-Tables-End***.\n");
-                customDataSources.put(dbEntity.getPoolName(), dataSource);
+                customDataSources.put(String.valueOf(dbEntity.get("pool_name")), dataSource);
             }
         }
     }
 
-    public HikariConfig buildHikariConfig(DbEntity dbEntity) {
+    public HikariConfig buildHikariConfig(Map<String, Object> dbEntity) {
         HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setDriverClassName(dbEntity.getDriverClassName());
-        hikariConfig.setJdbcUrl(dbEntity.getJdbcUrl());
-        hikariConfig.setPoolName(dbEntity.getPoolName());
-        hikariConfig.setUsername(dbEntity.getUsername());
-        hikariConfig.setPassword(dbEntity.getPassword());
-        hikariConfig.setMinimumIdle(dbEntity.getMinimumIdle());
-        hikariConfig.setMaximumPoolSize(dbEntity.getMaximumPoolSize());
-        hikariConfig.setConnectionTestQuery(dbEntity.getConnectionTestQuery());
+        hikariConfig.setDriverClassName(String.valueOf(dbEntity.get("driver_class_name")));
+        hikariConfig.setJdbcUrl(String.valueOf(dbEntity.get("jdbc_url")));
+        hikariConfig.setPoolName(String.valueOf(dbEntity.get("pool_name")));
+        hikariConfig.setUsername(String.valueOf(dbEntity.get("username")));
+        hikariConfig.setPassword(String.valueOf(dbEntity.get("password")));
+        hikariConfig.setMinimumIdle(Integer.parseInt(String.valueOf(dbEntity.get("minimum_idle"))));
+        hikariConfig.setMaximumPoolSize(Integer.parseInt(String.valueOf(dbEntity.get("maximum_pool_size"))));
+        hikariConfig.setConnectionTestQuery(String.valueOf(dbEntity.get("connection_test_query")));
         return hikariConfig;
     }
 
-    public List<DbEntity> queryDbEntityList(JdbcTemplate jdbcTemplate) {
-        return jdbcTemplate.query("select " +
-                        "driver_class_name AS driverClassName, " +
-                        "jdbc_url AS jdbcUrl, " +
-                        "pool_name AS poolName, " +
-                        "username AS username, " +
-                        "password AS password, " +
-                        "minimum_idle AS minimumIdle, " +
-                        "maximum_pool_size AS maximumPoolSize, " +
-                        "connection_test_query AS connectionTestQuery " +
-                        "from db_entity"
-                , new BeanPropertyRowMapper().newInstance(DbEntity.class));
+    public List<Map<String, Object>> queryDbEntityList(JdbcTemplate jdbcTemplate) {
+        List<Map<String, Object>> result = new ArrayList();
+        jdbcTemplate.query("SELECT " +
+                        "driver_class_name, " +
+                        "jdbc_url, " +
+                        "pool_name, " +
+                        "username, " +
+                        "password, " +
+                        "minimum_idle, " +
+                        "maximum_pool_size, " +
+                        "connection_test_query " +
+                        "FROM db_entity"
+                , rs -> {
+                    while (rs.next()) {
+                        Map<String, Object> item = new HashMap();
+                        item.put("driver_class_name", rs.getString("driver_class_name"));
+                        item.put("jdbc_url", rs.getString("jdbc_url"));
+                        item.put("pool_name", rs.getString("pool_name"));
+                        item.put("username", rs.getString("username"));
+                        item.put("password", rs.getString("password"));
+                        item.put("minimum_idle", rs.getString("minimum_idle"));
+                        item.put("maximum_pool_size", rs.getString("maximum_pool_size"));
+                        item.put("connection_test_query", rs.getString("connection_test_query"));
+                        result.add(item);
+                    }
+                    return result;
+                });
+        return result;
     }
 
     @Override

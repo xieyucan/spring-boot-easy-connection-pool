@@ -29,8 +29,7 @@ public class DynamicDataSourceAspect {
     @Before("@annotation(targetDataSource)")
     public void changeDataSource(JoinPoint point, TargetDataSource targetDataSource) {
         String dsName = targetDataSource.value();
-        String dataSourceName = DynamicDbSource.get();
-        dsName = StringUtils.isEmpty(dsName) ? dataSourceName : dsName;
+        dsName = StringUtils.isEmpty(dsName) ? DynamicDbSource.get() : dsName;
         if (!DynamicDataSourceContextHolder.containsDataSource(dsName)) {
             logger.error("DataSource [{}] not existing, Used default datasource [{}]", targetDataSource.value(), point.getSignature());
         } else {
@@ -41,7 +40,10 @@ public class DynamicDataSourceAspect {
 
     @After("@annotation(targetDataSource)")
     public void restoreDataSource(JoinPoint point, TargetDataSource targetDataSource) {
-        logger.debug("Revert DataSource = [{}] ,  signature = [{}]", targetDataSource.value(), point.getSignature());
+        String dsName = targetDataSource == null ?
+                DynamicDbSource.get() : StringUtils.isEmpty(targetDataSource.value()) ?
+                DynamicDbSource.get() : targetDataSource.value();
+        logger.debug("Revert DataSource = [{}] ,  signature = [{}]", dsName, point.getSignature());
         DynamicDataSourceContextHolder.clearDataSourceType();
         DynamicDbSource.remove();
     }
