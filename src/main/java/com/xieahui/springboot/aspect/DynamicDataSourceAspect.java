@@ -28,10 +28,11 @@ public class DynamicDataSourceAspect {
 
     @Before("@annotation(targetDataSource)")
     public void changeDataSource(JoinPoint point, TargetDataSource targetDataSource) {
-        String dsName = targetDataSource.value();
-        dsName = StringUtils.isEmpty(dsName) ? DynamicDbSource.get() : dsName;
+        String dsName = targetDataSource == null ?
+                DynamicDbSource.get() : StringUtils.isEmpty(targetDataSource.value()) ?
+                DynamicDbSource.get() : targetDataSource.value();
         if (!DynamicDataSourceContextHolder.containsDataSource(dsName)) {
-            logger.error("DataSource [{}] not existing, Used default datasource [{}]", targetDataSource.value(), point.getSignature());
+            logger.error("DataSource [{}] not existing, Used default datasource [{}]", dsName, point.getSignature());
         } else {
             logger.debug("Use DataSource name = [{}] , signature = [{}]", dsName, point.getSignature());
             DynamicDataSourceContextHolder.setDataSourceType(dsName);
