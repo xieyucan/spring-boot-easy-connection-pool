@@ -10,5 +10,52 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface TargetDataSource {
+
+    /**
+     * 默认dataSource名称
+     *
+     * @return
+     */
     String value() default "";
+
+    /**
+     * 组名称
+     * 指定使用哪个分组
+     * PS: 使用分组策略中,该字段必传。切不可重复,重复分组名只去第一个
+     *
+     * @return
+     */
+    String groupName() default "";
+
+    /**
+     * 分组连接
+     * 指定使用分组中的那个链接
+     *
+     * @return
+     */
+    String groupId() default "";
+
+    /**
+     * 指定使用负载均衡策略
+     * PS: 默认使用轮询策略
+     *
+     * @return
+     */
+    String balanceType() default LoadBalanceType.ROUND_ROBIN;
+
+    /**
+     * 定义负载均衡类型
+     */
+    class LoadBalanceType {
+
+        /**
+         * 随机
+         */
+        public static final String RANDOM = "random";
+
+        /**
+         * 轮询
+         */
+        public static final String ROUND_ROBIN = "roundRobin";
+    }
 }

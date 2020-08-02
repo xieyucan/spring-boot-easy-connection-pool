@@ -31,11 +31,19 @@ public class DynamicDataSourceAspect {
         String dsName = targetDataSource == null ?
                 DynamicDbSource.get() : StringUtils.isEmpty(targetDataSource.value()) ?
                 DynamicDbSource.get() : targetDataSource.value();
-        if (!DynamicDataSourceContextHolder.containsDataSource(dsName)) {
-            logger.error("DataSource [{}] not existing, Used default datasource [{}]", dsName, point.getSignature());
-        } else {
+
+        //优先使用直连
+        if (DynamicDataSourceContextHolder.containsDataSource(dsName)) {
             logger.debug("Use DataSource name = [{}] , signature = [{}]", dsName, point.getSignature());
-            DynamicDataSourceContextHolder.setDataSourceType(dsName);
+            DynamicDataSourceContextHolder.setDataSourceName(dsName);
+        } else {
+
+            String groupName = targetDataSource.groupName();
+            if (StringUtils.isEmpty(groupName)) {
+                logger.error("DataSource [{}] not existing, Used default datasource [{}]", dsName, point.getSignature());
+            } else {
+                DynamicDataSourceContextHolder.setDataSourceGroup(groupName, targetDataSource.groupId(), targetDataSource.balanceType());
+            }
         }
     }
 
@@ -45,7 +53,7 @@ public class DynamicDataSourceAspect {
                 DynamicDbSource.get() : StringUtils.isEmpty(targetDataSource.value()) ?
                 DynamicDbSource.get() : targetDataSource.value();
         logger.debug("Revert DataSource = [{}] ,  signature = [{}]", dsName, point.getSignature());
-        DynamicDataSourceContextHolder.clearDataSourceType();
+        DynamicDataSourceContextHolder.clearDataSource();
         DynamicDbSource.remove();
     }
 
