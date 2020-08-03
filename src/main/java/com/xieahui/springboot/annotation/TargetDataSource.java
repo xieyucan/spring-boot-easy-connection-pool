@@ -1,5 +1,7 @@
 package com.xieahui.springboot.annotation;
 
+import com.xieahui.springboot.config.Contains;
+
 import java.lang.annotation.*;
 
 /**
@@ -41,21 +43,6 @@ public @interface TargetDataSource {
      *
      * @return
      */
-    String balanceType() default LoadBalanceType.ROUND_ROBIN;
+    String balanceType() default Contains.LoadBalanceType.ROUND_ROBIN;
 
-    /**
-     * 定义负载均衡类型
-     */
-    class LoadBalanceType {
-
-        /**
-         * 随机
-         */
-        public static final String RANDOM = "random";
-
-        /**
-         * 轮询
-         */
-        public static final String ROUND_ROBIN = "roundRobin";
-    }
 }

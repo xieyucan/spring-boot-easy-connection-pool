@@ -1,6 +1,6 @@
 package com.xieahui.springboot;
 
-import com.xieahui.springboot.annotation.TargetDataSource;
+import com.xieahui.springboot.config.Contains;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
@@ -47,7 +47,7 @@ public final class GroupDataSource implements Serializable {
 
     public String getBalanceType() {
         if (StringUtils.isEmpty(balanceType))
-            return TargetDataSource.LoadBalanceType.ROUND_ROBIN;
+            return Contains.LoadBalanceType.ROUND_ROBIN;
         return balanceType;
     }
 

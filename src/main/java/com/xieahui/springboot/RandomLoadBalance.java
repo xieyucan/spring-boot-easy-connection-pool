@@ -1,5 +1,7 @@
 package com.xieahui.springboot;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.Random;
  * Created by xiehui1956(@)gmail.com on 2020/8/1
  */
 public class RandomLoadBalance implements LoadBalance {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public List<String> dataSourceIds;
 
@@ -32,6 +36,8 @@ public class RandomLoadBalance implements LoadBalance {
         }
 
         int index = random.nextInt(localEnabledUrls.size());
-        return localEnabledUrls.get(index);
+        String select = localEnabledUrls.get(index);
+        logger.info("*** LoadBalance-RoundRobinLoadBalance Select {} Success! ***", select);
+        return select;
     }
 }

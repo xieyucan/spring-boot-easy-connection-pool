@@ -51,7 +51,7 @@ public class DynamicDataSourceAspect {
             dsName = DynamicDbSource.get();
 
             //db分组配置
-            if (StringUtils.isEmpty(dsName)) {
+            if (StringUtils.isEmpty(dsName) && null != DynamicDbSource.getGroupDataSource()) {
                 dsName = DynamicDbSource.getGroupDataSource().getGroupId();
                 groupName = DynamicDbSource.getGroupDataSource().getGroupName();
                 balanceType = DynamicDbSource.getGroupDataSource().getBalanceType();
@@ -90,7 +90,7 @@ public class DynamicDataSourceAspect {
             dsName = DynamicDbSource.get();
 
             //db分组配置
-            if (StringUtils.isEmpty(dsName)) {
+            if (StringUtils.isEmpty(dsName) && null != DynamicDbSource.getGroupDataSource()) {
                 dsName = DynamicDbSource.getGroupDataSource().getGroupId();
             }
         }

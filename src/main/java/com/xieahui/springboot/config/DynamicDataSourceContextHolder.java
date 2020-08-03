@@ -3,7 +3,6 @@ package com.xieahui.springboot.config;
 import com.xieahui.springboot.LoadBalance;
 import com.xieahui.springboot.RandomLoadBalance;
 import com.xieahui.springboot.RoundRobinLoadBalance;
-import com.xieahui.springboot.annotation.TargetDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -50,7 +49,7 @@ public class DynamicDataSourceContextHolder {
             LoadBalance loadBalance = new RoundRobinLoadBalance(dataSourceGroupList, dataSourceGroupName);
 
             //随机
-            if (TargetDataSource.LoadBalanceType.RANDOM.equals(balanceType)) {
+            if (Contains.LoadBalanceType.RANDOM.equals(balanceType)) {
                 loadBalance = new RandomLoadBalance(dataSourceGroupList);
             }
 

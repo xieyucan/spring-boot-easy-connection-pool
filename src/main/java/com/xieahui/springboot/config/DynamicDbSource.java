@@ -12,13 +12,20 @@ public class DynamicDbSource {
 
     static Logger logger = LoggerFactory.getLogger(DynamicDbSource.class);
 
-    private final static ThreadLocal<GroupDataSource> dataSource = new ThreadLocal();
+    private final static ThreadLocal<GroupDataSource> dataSource = new ThreadLocal<GroupDataSource>();
 
     public static void set(String targetDataSourceId) {
         logger.info("Set-Thread-Id = " + Thread.currentThread().getId() + " ;targetDataSourceName = " + targetDataSourceId);
         dataSource.set(new GroupDataSource(targetDataSourceId));
     }
 
+    /**
+     * 设置分组连接池
+     *
+     * @param targetDataSourceGroupName
+     * @param targetDataSourceId
+     * @param targetBalanceType
+     */
     public static void set(String targetDataSourceGroupName, String targetDataSourceId, String targetBalanceType) {
         logger.info("Set-Thread-Id = " + Thread.currentThread().getId()
                 + " ;targetDataSourceGroupName = " + targetDataSourceGroupName
@@ -29,7 +36,8 @@ public class DynamicDbSource {
 
     public static String get() {
         logger.info("Get-Thread-Id = " + Thread.currentThread().getId() + " ;targetDataSourceName = " + dataSource.get());
-        return dataSource.get().getGroupId();
+        GroupDataSource groupDataSource = dataSource.get();
+        return null == groupDataSource ? "" : groupDataSource.getGroupId();
     }
 
     public static GroupDataSource getGroupDataSource() {

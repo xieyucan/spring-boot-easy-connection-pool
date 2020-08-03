@@ -237,16 +237,21 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
      */
     public Map<String, List<String>> buildGroupDataSource(List<Map<String, Object>> entityList) {
         Map<String, List<String>> result = new ConcurrentHashMap();
-        Optional.ofNullable(entityList).orElse(new ArrayList<Map<String, Object>>()).stream()
-                .filter(entryItem -> !StringUtils.isEmpty(String.valueOf(entryItem.get("group_name"))))
-                .collect(Collectors.groupingBy(entryItem -> String.valueOf(entryItem.get("group_name"))))
-                .entrySet().stream().forEach(entryItem -> {
+        for (Map.Entry<String, List<Map<String, Object>>> entryItem :
+                Optional.ofNullable(entityList).orElse(new ArrayList<Map<String, Object>>()).stream()
+                        .filter(entryItem -> !StringUtils.isEmpty(String.valueOf(entryItem.get("group_name"))))
+                        .collect(Collectors.groupingBy(entryItem -> String.valueOf(entryItem.get("group_name"))))
+                        .entrySet()) {
+
             String key = entryItem.getKey();
             List<String> groupIdList = entryItem.getValue().stream()
                     .map(mapItem -> String.valueOf(mapItem.get("group_id"))).collect(Collectors.toList());
-            result.put(key, groupIdList);
-        });
+            if ("null".equals(key))
+                continue;
 
+            logger.info("*** Create Group  = {} DataSourceList = {} Success! ***", key, groupIdList);
+            result.put(key, groupIdList);
+        }
         return result;
     }
 
@@ -274,6 +279,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 
                 groupIdList.add(group_id);
                 result.put(group_name, groupIdList);
+                logger.info("*** Create Group  = {} DataSource = {} Success! ***", group_name, group_id);
             }
         }
         return result;
