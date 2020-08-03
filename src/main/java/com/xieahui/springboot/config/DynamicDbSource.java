@@ -4,6 +4,7 @@ import com.xieahui.springboot.GroupDataSource;
 import com.xieahui.springboot.LoadBalanceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 /**
  * 该方法数据源设置需要在AOP之前执行
@@ -15,6 +16,11 @@ public class DynamicDbSource {
 
     private final static ThreadLocal<GroupDataSource> dataSource = new ThreadLocal<GroupDataSource>();
 
+    /**
+     * 设置连接池
+     *
+     * @param targetDataSourceId
+     */
     public static void set(String targetDataSourceId) {
         logger.info("Set-Thread-Id = " + Thread.currentThread().getId() + " ;targetDataSourceName = " + targetDataSourceId);
         dataSource.set(new GroupDataSource(targetDataSourceId));
@@ -23,11 +29,31 @@ public class DynamicDbSource {
     /**
      * 设置分组连接池
      *
-     * @param targetDataSourceGroupName
-     * @param targetDataSourceId
-     * @param targetBalanceType
+     * @param targetDataSourceGroupName 分组名
+     */
+    public static void setGroupName(String targetDataSourceGroupName) {
+        dataSource.set(new GroupDataSource(targetDataSourceGroupName, null, LoadBalanceType.ROUND_ROBIN));
+    }
+
+    /**
+     * 设置分组连接池
+     *
+     * @param targetDataSourceGroupName 分组名
+     * @param targetDataSourceId        分组连接池名
+     */
+    public static void setGroupNamePoolName(String targetDataSourceGroupName, String targetDataSourceId) {
+        dataSource.set(new GroupDataSource(targetDataSourceGroupName, targetDataSourceId, LoadBalanceType.ROUND_ROBIN));
+    }
+
+    /**
+     * 设置分组连接池
+     *
+     * @param targetDataSourceGroupName 分组名
+     * @param targetDataSourceId        分组连接池名
+     * @param targetBalanceType         负载均衡类型
      */
     public static void set(String targetDataSourceGroupName, String targetDataSourceId, LoadBalanceType targetBalanceType) {
+        targetDataSourceId = StringUtils.isEmpty(targetDataSourceId) ? "" : targetDataSourceId;
         logger.info("Set-Thread-Id = " + Thread.currentThread().getId()
                 + " ;targetDataSourceGroupName = " + targetDataSourceGroupName
                 + " ;targetDataSourceName = " + targetDataSourceId
