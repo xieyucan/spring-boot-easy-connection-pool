@@ -238,21 +238,4 @@ public class Contains {
          */
         public static final String PASSWORD = "password";
     }
-
-    /**
-     * 定义负载均衡类型
-     */
-    public class LoadBalanceType {
-
-        /**
-         * 随机
-         */
-        public static final String RANDOM = "random";
-
-        /**
-         * 轮询
-         */
-        public static final String ROUND_ROBIN = "roundRobin";
-    }
-
 }

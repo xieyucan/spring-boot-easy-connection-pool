@@ -1,5 +1,6 @@
 package com.xieahui.springboot.aspect;
 
+import com.xieahui.springboot.LoadBalanceType;
 import com.xieahui.springboot.annotation.TargetDataSource;
 import com.xieahui.springboot.config.DynamicDataSourceContextHolder;
 import com.xieahui.springboot.config.DynamicDbSource;
@@ -27,12 +28,11 @@ public class DynamicDataSourceAspect {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Before("@annotation(targetDataSource)")
-    public void changeDataSource(JoinPoint point, TargetDataSource targetDataSource) throws NoSuchMethodException {
+    public void changeDataSource(JoinPoint point, TargetDataSource targetDataSource) {
 
-        targetDataSource = point.getTarget().getClass()
-                .getMethod(point.getSignature().getName()).getAnnotation(TargetDataSource.class);
-
-        String dsName = null, groupName = null, balanceType = null;
+        String dsName = null;
+        String groupName = null;
+        LoadBalanceType balanceType = null;
 
         if (null != targetDataSource) {
             dsName = targetDataSource.value();
@@ -51,7 +51,7 @@ public class DynamicDataSourceAspect {
         }
 
         // db未分组配置
-        if (StringUtils.isEmpty(dsName)) {
+        if (StringUtils.isEmpty(dsName) && StringUtils.isEmpty(groupName)) {
             dsName = DynamicDbSource.get();
 
             //db分组配置
@@ -66,7 +66,7 @@ public class DynamicDataSourceAspect {
 
             logger.debug("Use DataSource name = [{}] , signature = [{}]", dsName, point.getSignature());
             DynamicDataSourceContextHolder.setDataSourceName(dsName);
-        } else if (DynamicDataSourceContextHolder.containsDataSourceGroup(dsName)) {
+        } else if (DynamicDataSourceContextHolder.containsDataSourceGroup(groupName)) {
 
             logger.debug("Use DataSource name = [{}] , signature = [{}]", dsName, point.getSignature());
             DynamicDataSourceContextHolder.setDataSourceGroup(groupName, dsName, balanceType);
@@ -77,9 +77,7 @@ public class DynamicDataSourceAspect {
     }
 
     @After("@annotation(targetDataSource)")
-    public void restoreDataSource(JoinPoint point, TargetDataSource targetDataSource) throws NoSuchMethodException {
-        targetDataSource = point.getTarget().getClass()
-                .getMethod(point.getSignature().getName()).getAnnotation(TargetDataSource.class);
+    public void restoreDataSource(JoinPoint point, TargetDataSource targetDataSource) {
 
         String dsName = null;
         if (null != targetDataSource) {

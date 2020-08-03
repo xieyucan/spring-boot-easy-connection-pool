@@ -1,6 +1,7 @@
 package com.xieahui.springboot.config;
 
 import com.xieahui.springboot.GroupDataSource;
+import com.xieahui.springboot.LoadBalanceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,7 @@ public class DynamicDbSource {
      * @param targetDataSourceId
      * @param targetBalanceType
      */
-    public static void set(String targetDataSourceGroupName, String targetDataSourceId, String targetBalanceType) {
+    public static void set(String targetDataSourceGroupName, String targetDataSourceId, LoadBalanceType targetBalanceType) {
         logger.info("Set-Thread-Id = " + Thread.currentThread().getId()
                 + " ;targetDataSourceGroupName = " + targetDataSourceGroupName
                 + " ;targetDataSourceName = " + targetDataSourceId

@@ -1,6 +1,6 @@
 package com.xieahui.springboot.annotation;
 
-import com.xieahui.springboot.config.Contains;
+import com.xieahui.springboot.LoadBalanceType;
 
 import java.lang.annotation.*;
 
@@ -43,6 +43,6 @@ public @interface TargetDataSource {
      *
      * @return
      */
-    String balanceType() default Contains.LoadBalanceType.ROUND_ROBIN;
+    LoadBalanceType balanceType() default LoadBalanceType.ROUND_ROBIN;
 
 }

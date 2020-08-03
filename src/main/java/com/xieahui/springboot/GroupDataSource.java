@@ -1,6 +1,5 @@
 package com.xieahui.springboot;
 
-import com.xieahui.springboot.config.Contains;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
@@ -14,7 +13,7 @@ public final class GroupDataSource implements Serializable {
 
     private String groupId;
 
-    private String balanceType;
+    private LoadBalanceType balanceType;
 
     public GroupDataSource() {
     }
@@ -23,7 +22,7 @@ public final class GroupDataSource implements Serializable {
         this.groupId = groupId;
     }
 
-    public GroupDataSource(String groupName, String groupId, String balanceType) {
+    public GroupDataSource(String groupName, String groupId, LoadBalanceType balanceType) {
         this.groupName = groupName;
         this.groupId = groupId;
         this.balanceType = balanceType;
@@ -45,13 +44,13 @@ public final class GroupDataSource implements Serializable {
         this.groupId = groupId;
     }
 
-    public String getBalanceType() {
+    public LoadBalanceType getBalanceType() {
         if (StringUtils.isEmpty(balanceType))
-            return Contains.LoadBalanceType.ROUND_ROBIN;
+            return LoadBalanceType.ROUND_ROBIN;
         return balanceType;
     }
 
-    public void setBalanceType(String balanceType) {
+    public void setBalanceType(LoadBalanceType balanceType) {
         this.balanceType = balanceType;
     }
 }

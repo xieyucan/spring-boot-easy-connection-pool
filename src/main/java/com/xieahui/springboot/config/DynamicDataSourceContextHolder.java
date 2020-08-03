@@ -1,6 +1,7 @@
 package com.xieahui.springboot.config;
 
 import com.xieahui.springboot.LoadBalance;
+import com.xieahui.springboot.LoadBalanceType;
 import com.xieahui.springboot.RandomLoadBalance;
 import com.xieahui.springboot.RoundRobinLoadBalance;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class DynamicDataSourceContextHolder {
      *
      * @param dataSourceGroupName 数据源分组
      */
-    public static void setDataSourceGroup(String dataSourceGroupName, String dataSourceGroupId, String balanceType) {
+    public static void setDataSourceGroup(String dataSourceGroupName, String dataSourceGroupId, LoadBalanceType balanceType) {
 
         if (StringUtils.isEmpty(dataSourceGroupId)) {
 
@@ -49,7 +50,7 @@ public class DynamicDataSourceContextHolder {
             LoadBalance loadBalance = new RoundRobinLoadBalance(dataSourceGroupList, dataSourceGroupName);
 
             //随机
-            if (Contains.LoadBalanceType.RANDOM.equals(balanceType)) {
+            if (LoadBalanceType.RANDOM.equals(balanceType)) {
                 loadBalance = new RandomLoadBalance(dataSourceGroupList);
             }
 
@@ -81,15 +82,10 @@ public class DynamicDataSourceContextHolder {
     /**
      * 判断指定Group的DataSource当前是否存在
      *
-     * @param dataSourceId 数据源名
+     * @param groupName 数据源名
      * @return
      */
-    public static boolean containsDataSourceGroup(String dataSourceId) {
-        for (Map.Entry<String, List<String>> entry : dataSourceGroupIds.entrySet()) {
-            if (entry.getValue().contains(dataSourceId)) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean containsDataSourceGroup(String groupName) {
+        return dataSourceGroupIds.containsKey(groupName);
     }
 }
