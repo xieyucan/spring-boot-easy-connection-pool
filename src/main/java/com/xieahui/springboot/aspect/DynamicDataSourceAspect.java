@@ -28,13 +28,22 @@ public class DynamicDataSourceAspect {
 
     @Before("@annotation(targetDataSource)")
     public void changeDataSource(JoinPoint point, TargetDataSource targetDataSource) {
-        String dsName = targetDataSource.value(), groupName = null, balanceType = null;
+        String dsName = null, groupName = null, balanceType = null;
 
-        //注解未分组配置
-        if (StringUtils.isEmpty(dsName)) {
-            dsName = targetDataSource.groupId();
-            groupName = targetDataSource.groupName();
-            balanceType = targetDataSource.balanceType();
+        if (null != targetDataSource) {
+            dsName = targetDataSource.value();
+
+            //注解未分组配置
+            if (StringUtils.isEmpty(dsName)) {
+                dsName = targetDataSource.groupId();
+            }
+
+            //注解未分组配置
+            if (StringUtils.isEmpty(dsName)) {
+                dsName = targetDataSource.groupId();
+                groupName = targetDataSource.groupName();
+                balanceType = targetDataSource.balanceType();
+            }
         }
 
         // db未分组配置
@@ -65,11 +74,15 @@ public class DynamicDataSourceAspect {
 
     @After("@annotation(targetDataSource)")
     public void restoreDataSource(JoinPoint point, TargetDataSource targetDataSource) {
-        String dsName = targetDataSource.value();
 
-        //注解未分组配置
-        if (StringUtils.isEmpty(dsName)) {
-            dsName = targetDataSource.groupId();
+        String dsName = null;
+        if (null != targetDataSource) {
+            dsName = targetDataSource.value();
+
+            //注解未分组配置
+            if (StringUtils.isEmpty(dsName)) {
+                dsName = targetDataSource.groupId();
+            }
         }
 
         // db未分组配置

@@ -260,9 +260,12 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
         Map<String, List<String>> result = new ConcurrentHashMap();
         String dsPrefixes = environment.getProperty(Contains.getDsNameKey());
         if (!StringUtils.isEmpty(dsPrefixes)) {
-            Arrays.stream(dsPrefixes.split(",")).forEach(dsPrefix -> {
-                String group_name = environment.getProperty(Contains.getDsPoolPrefix(dsPrefix, "group_name"));
-                String group_id = environment.getProperty(Contains.getDsPoolPrefix(dsPrefix, "group_id"));
+            for (String dsPrefix : dsPrefixes.split(",")) {
+                String group_name = environment.getProperty(Contains.getDsPoolPrefix(dsPrefix, "groupName"));
+                String group_id = environment.getProperty(Contains.getDsPoolPrefix(dsPrefix, "groupId"));
+
+                if (StringUtils.isEmpty(group_name) || StringUtils.isEmpty(group_id))
+                    continue;
 
                 List<String> groupIdList = new ArrayList();
                 if (result.containsKey(group_name)) {
@@ -271,7 +274,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 
                 groupIdList.add(group_id);
                 result.put(group_name, groupIdList);
-            });
+            }
         }
         return result;
     }
