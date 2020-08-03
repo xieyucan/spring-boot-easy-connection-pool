@@ -265,9 +265,8 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
         if (!StringUtils.isEmpty(dsPrefixes)) {
             for (String dsPrefix : dsPrefixes.split(",")) {
                 String group_name = environment.getProperty(Contains.getDsPoolPrefix(dsPrefix, "groupName"));
-                String pool_name = environment.getProperty(Contains.getDsPoolPrefix(dsPrefix, "poolName"));
 
-                if (StringUtils.isEmpty(group_name) || StringUtils.isEmpty(pool_name))
+                if (StringUtils.isEmpty(group_name) || StringUtils.isEmpty(dsPrefix))
                     continue;
 
                 List<String> groupIdList = new ArrayList();
@@ -275,9 +274,9 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
                     groupIdList = result.get(group_name);
                 }
 
-                groupIdList.add(pool_name);
+                groupIdList.add(dsPrefix);
                 result.put(group_name, groupIdList);
-                logger.info("*** Create Group  = {} DataSource = {} Success! ***", group_name, pool_name);
+                logger.info("*** Create Group  = {} DataSource = {} Success! ***", group_name, dsPrefix);
             }
         }
         return result;
