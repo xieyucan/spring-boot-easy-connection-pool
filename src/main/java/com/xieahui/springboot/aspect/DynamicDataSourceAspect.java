@@ -27,7 +27,11 @@ public class DynamicDataSourceAspect {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Before("@annotation(targetDataSource)")
-    public void changeDataSource(JoinPoint point, TargetDataSource targetDataSource) {
+    public void changeDataSource(JoinPoint point, TargetDataSource targetDataSource) throws NoSuchMethodException {
+
+        targetDataSource = point.getTarget().getClass()
+                .getMethod(point.getSignature().getName()).getAnnotation(TargetDataSource.class);
+
         String dsName = null, groupName = null, balanceType = null;
 
         if (null != targetDataSource) {
@@ -73,7 +77,9 @@ public class DynamicDataSourceAspect {
     }
 
     @After("@annotation(targetDataSource)")
-    public void restoreDataSource(JoinPoint point, TargetDataSource targetDataSource) {
+    public void restoreDataSource(JoinPoint point, TargetDataSource targetDataSource) throws NoSuchMethodException {
+        targetDataSource = point.getTarget().getClass()
+                .getMethod(point.getSignature().getName()).getAnnotation(TargetDataSource.class);
 
         String dsName = null;
         if (null != targetDataSource) {
