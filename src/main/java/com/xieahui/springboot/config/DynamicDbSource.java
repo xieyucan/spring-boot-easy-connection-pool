@@ -52,7 +52,8 @@ public class DynamicDbSource {
      * @param targetDataSourceId        分组连接池名
      * @param targetBalanceType         负载均衡类型
      */
-    public static void set(String targetDataSourceGroupName, String targetDataSourceId, LoadBalanceType targetBalanceType) {
+    public static void setGroupNamePoolNameBalanceType(String targetDataSourceGroupName, String targetDataSourceId
+            , LoadBalanceType targetBalanceType) {
         targetDataSourceId = StringUtils.isEmpty(targetDataSourceId) ? "" : targetDataSourceId;
         logger.info("Set-Thread-Id = " + Thread.currentThread().getId()
                 + " ;targetDataSourceGroupName = " + targetDataSourceGroupName

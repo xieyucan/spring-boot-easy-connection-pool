@@ -23,6 +23,52 @@
 ### 使用实例
 和该项目配置的[实例项目](https://github.com/xieyucan/easy-connection-pool-demo) 可以点击查看
 
+### V1.1.0 - 更新说明
+```javascript
+主要增加如下：
+ 1. 更新数据库脚本,见resources->script->db_entity.sql
+ 2. 更新注解TargetDataSource；
+ 3. 更新逻辑指定配置DynamicDbSource； 
+ 4. 增加数据源连接分组；
+ 5. 增加负载均衡策略：
+    A. 随机负载均衡策略；
+    B. 轮询负载均衡策略；
+```
+
+#### 新增功能演示实例
+该版本对应的演示实例:
+```java
+easy-connection-pool-demo -> easy-jdbctemplate -> com.xieahui.easy.jdbctemplate.controller.GroupDSController
+```
+
+链接为：
+[GroupDSController.java](https://github.com/xieyucan/easy-connection-pool-demo/blob/master/easy-jdbctemplate/src/main/java/com/xieahui/easy/jdbctemplate/controller/GroupDSController.java)
+
+#### 更新数据库脚本
+新增分组名称字段group_name、负载均衡类型字段balance_type、增加连接池名称pool_name非空唯一限制。
+
+#### 更新注解TargetDataSource
+更新注解TargetDataSource适配分组、负载逻辑；
+新增注解配置分组groupName、注解配置连接池名称poolName、注解配置负载均衡策略balanceType
+
+#### 更新逻辑指定配置DynamicDbSource
+更新逻辑指定配置DynamicDbSource适配分组、负载逻辑；
+新增指定(分组名称)方法setGroupName、指定(分组,具体数据源名称)方法setGroupNamePoolName、指定(分组,数据源名称,负载策略)方法setGroupNamePoolNameBalanceType
+
+#### 增加数据源连接分组
+数据源加载优先级：
+```javascript
+db -> properties
+```
+
+数据源使用优先级：
+```javascript
+properties -> properties-group -> db -> db-group
+```
+
+#### 增加负载均衡策略
+分组后会涉及到分组数据源的选取策略，1.1.0版本实现了随机、轮询两种较常见的负载均衡策略。默认使用轮询策略。
+
 ### V1.0.1 - 更新说明
 新增从默认数据库中获取数据源连接信息，使用说明。
 #### 1. 开启从数据库中加载数据源属性设置：
