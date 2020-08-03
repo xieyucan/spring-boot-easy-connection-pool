@@ -9,10 +9,19 @@ import java.io.Serializable;
  */
 public final class GroupDataSource implements Serializable {
 
+    /**
+     * 分组名
+     */
     private String groupName;
 
+    /**
+     * 连接池名称-poolName
+     */
     private String groupId;
 
+    /**
+     * 负载均衡类型
+     */
     private LoadBalanceType balanceType;
 
     public GroupDataSource() {

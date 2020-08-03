@@ -15,7 +15,7 @@ public @interface TargetDataSource {
 
     /**
      * 默认dataSource名称
-     *
+     * 如果是分组,该字段也是分组中对应的连接池名称
      * @return
      */
     String value() default "";
@@ -35,7 +35,7 @@ public @interface TargetDataSource {
      *
      * @return
      */
-    String groupId() default "";
+    String poolName() default "";
 
     /**
      * 指定使用负载均衡策略

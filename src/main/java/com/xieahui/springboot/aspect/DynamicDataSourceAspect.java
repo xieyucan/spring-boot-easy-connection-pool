@@ -39,12 +39,12 @@ public class DynamicDataSourceAspect {
 
             //注解未分组配置
             if (StringUtils.isEmpty(dsName)) {
-                dsName = targetDataSource.groupId();
+                dsName = targetDataSource.poolName();
             }
 
             //注解未分组配置
             if (StringUtils.isEmpty(dsName)) {
-                dsName = targetDataSource.groupId();
+                dsName = targetDataSource.poolName();
                 groupName = targetDataSource.groupName();
                 balanceType = targetDataSource.balanceType();
             }
@@ -85,7 +85,7 @@ public class DynamicDataSourceAspect {
 
             //注解未分组配置
             if (StringUtils.isEmpty(dsName)) {
-                dsName = targetDataSource.groupId();
+                dsName = targetDataSource.poolName();
             }
         }
 
