@@ -23,6 +23,7 @@ public class DynamicDataSourceContextHolder {
     private static final ThreadLocal<String> contextHolder = new ThreadLocal();
 
     public static List<String> dataSourceIds = new ArrayList();
+
     public static Map<String, List<String>> dataSourceGroupIds = new HashMap();
 
     /**

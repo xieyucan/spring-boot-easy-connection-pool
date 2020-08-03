@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 动态数据源注册
@@ -34,7 +35,10 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
 
     // 数据源
     private DataSource defaultDataSource;
+
     private Map<String, DataSource> customDataSources = new ConcurrentHashMap();
+
+    private Map<String, List<String>> customDataSourcesGroup = new ConcurrentHashMap();
 
     /**
      * 加载多数据源配置
@@ -66,6 +70,8 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
      */
     private void initCustomDataSources(Environment environment) {
         String dsPrefixes = environment.getProperty(Contains.getDsNameKey());
+        //添加分组数据
+        customDataSourcesGroup.putAll(buildGroupDataSource(environment));
         if (!StringUtils.isEmpty(dsPrefixes)) {
             Arrays.stream(dsPrefixes.split(",")).forEach(dsPrefix -> {
                 DataSource dataSource = buildDataSource(dsPrefix, environment);
@@ -86,6 +92,8 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
         if (environment.getProperty(Contains.getDbOpen(), Boolean.class) == null ? false : true) {
             JdbcTemplate jdbcTemplate = new JdbcTemplate(this.defaultDataSource);
             List<Map<String, Object>> entityList = queryDbEntityList(jdbcTemplate);
+            //添加分组数据
+            customDataSourcesGroup.putAll(buildGroupDataSource(entityList));
             for (int i = 0; i < entityList.size(); i++) {
                 Map<String, Object> dbEntity = entityList.get(i);
                 HikariConfig hikariConfig = buildHikariConfig(dbEntity);
@@ -118,6 +126,9 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
                         "driver_class_name, " +
                         "jdbc_url, " +
                         "pool_name, " +
+                        "group_name, " +
+                        "group_id, " +
+                        "balance_type, " +
                         "username, " +
                         "password, " +
                         "minimum_idle, " +
@@ -130,6 +141,9 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
                         item.put("driver_class_name", rs.getString("driver_class_name"));
                         item.put("jdbc_url", rs.getString("jdbc_url"));
                         item.put("pool_name", rs.getString("pool_name"));
+                        item.put("group_name", rs.getString("group_name"));
+                        item.put("group_id", rs.getString("group_id"));
+                        item.put("balance_type", rs.getString("balance_type"));
                         item.put("username", rs.getString("username"));
                         item.put("password", rs.getString("password"));
                         item.put("minimum_idle", rs.getString("minimum_idle"));
@@ -153,6 +167,8 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
         for (String key : customDataSources.keySet()) {
             DynamicDataSourceContextHolder.dataSourceIds.add(key);
         }
+        //添加分组数据源
+        DynamicDataSourceContextHolder.dataSourceGroupIds.putAll(customDataSourcesGroup);
 
         // 创建DynamicDataSource
         GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
@@ -212,4 +228,52 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
             throwAbles.printStackTrace();
         }
     }
+
+    /**
+     * 按照group_name分组数据源
+     *
+     * @param entityList
+     * @return
+     */
+    public Map<String, List<String>> buildGroupDataSource(List<Map<String, Object>> entityList) {
+        Map<String, List<String>> result = new ConcurrentHashMap();
+        Optional.ofNullable(entityList).orElse(new ArrayList<Map<String, Object>>()).stream()
+                .filter(entryItem -> !StringUtils.isEmpty(String.valueOf(entryItem.get("group_name"))))
+                .collect(Collectors.groupingBy(entryItem -> String.valueOf(entryItem.get("group_name"))))
+                .entrySet().stream().forEach(entryItem -> {
+            String key = entryItem.getKey();
+            List<String> groupIdList = entryItem.getValue().stream()
+                    .map(mapItem -> String.valueOf(mapItem.get("group_id"))).collect(Collectors.toList());
+            result.put(key, groupIdList);
+        });
+
+        return result;
+    }
+
+    /**
+     * 按照group_name分组数据源
+     *
+     * @param environment
+     * @return
+     */
+    public Map<String, List<String>> buildGroupDataSource(Environment environment) {
+        Map<String, List<String>> result = new ConcurrentHashMap();
+        String dsPrefixes = environment.getProperty(Contains.getDsNameKey());
+        if (!StringUtils.isEmpty(dsPrefixes)) {
+            Arrays.stream(dsPrefixes.split(",")).forEach(dsPrefix -> {
+                String group_name = environment.getProperty(Contains.getDsPoolPrefix(dsPrefix, "group_name"));
+                String group_id = environment.getProperty(Contains.getDsPoolPrefix(dsPrefix, "group_id"));
+
+                List<String> groupIdList = new ArrayList();
+                if (result.containsKey(group_name)) {
+                    groupIdList = result.get(group_name);
+                }
+
+                groupIdList.add(group_id);
+                result.put(group_name, groupIdList);
+            });
+        }
+        return result;
+    }
+
 }

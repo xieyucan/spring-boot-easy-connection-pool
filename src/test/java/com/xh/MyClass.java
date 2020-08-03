@@ -10,6 +10,5 @@ public class MyClass {
     private static final AtomicInteger atomicInteger = new AtomicInteger();
 
     public static void main(String[] args) {
-        String group = "g1", dataSourceId = "ds1-2";
     }
 }
