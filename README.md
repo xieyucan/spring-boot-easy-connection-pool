@@ -26,7 +26,7 @@
 ### V1.1.0 - 更新说明
 ```javascript
 主要增加如下：
- 1. 更新数据库脚本,见resources->script->db_entity.sql
+ 1. 更新数据库脚本；
  2. 更新注解TargetDataSource；
  3. 更新逻辑指定配置DynamicDbSource； 
  4. 增加数据源连接分组；
@@ -46,6 +46,10 @@ easy-connection-pool-demo -> easy-jdbctemplate -> com.xieahui.easy.jdbctemplate.
 
 #### 更新数据库脚本
 新增分组名称字段group_name、负载均衡类型字段balance_type、增加连接池名称pool_name非空唯一限制。
+脚本路径：
+```java
+resources->script->db_entity.sql
+```
 
 #### 更新注解TargetDataSource
 更新注解TargetDataSource适配分组、负载逻辑；
@@ -77,18 +81,28 @@ spring.datasource.db.open=true
 ```
 
 #### 2. 创建数据库数据源表
+最新脚本路径：
+```java
+resources->script->db_entity.sql
+```
+
 ```jql
-CREATE TABLE `easy_pool_demo`.`db_entity` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `driver_class_name` VARCHAR(45) NULL DEFAULT 'com.mysql.cj.jdbc.Driver',
-  `jdbc_url` VARCHAR(45) NULL,
-  `pool_name` VARCHAR(45) NULL,
-  `username` VARCHAR(45) NULL,
-  `password` VARCHAR(45) NULL,
-  `minimum_idle` INT NULL DEFAULT 5,
-  `maximum_pool_size` INT NULL DEFAULT 10,
-  `connection_test_query` VARCHAR(45) NULL DEFAULT 'SELECT 1',
-  PRIMARY KEY (`id`));
+CREATE TABLE `db_entity` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `driver_class_name` varchar(45) DEFAULT 'com.mysql.cj.jdbc.Driver' COMMENT '驱动类',
+  `jdbc_url` varchar(45) DEFAULT NULL COMMENT '数据库连接地址<jdbc:mysql://ip:port/db>,必填！',
+  `pool_name` varchar(45) NOT NULL COMMENT '连接池名称,必填！',
+  `username` varchar(45) DEFAULT NULL COMMENT '用户名',
+  `password` varchar(45) DEFAULT NULL COMMENT '密码',
+  `minimum_idle` int(11) DEFAULT '5' COMMENT '最小空闲连接数',
+  `maximum_pool_size` int(11) DEFAULT '10' COMMENT '最大连接数',
+  `connection_test_query` varchar(45) DEFAULT 'SELECT 1' COMMENT '测试连接是否有效SQL',
+  `group_name` varchar(45) DEFAULT NULL COMMENT '分组名',
+  `balance_type` varchar(45) DEFAULT NULL COMMENT '负载均衡类型',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `pool_name_UNIQUE` (`pool_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
 ```
 
 该表结构在resources/script/db_entity.sql文件中
