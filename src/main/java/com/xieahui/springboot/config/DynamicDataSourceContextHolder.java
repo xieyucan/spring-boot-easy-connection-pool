@@ -81,14 +81,14 @@ public class DynamicDataSourceContextHolder {
     /**
      * 判断指定Group的DataSource当前是否存在
      *
-     * @param group        分组名
      * @param dataSourceId 数据源名
      * @return
      */
-    public static boolean containsDataSource(String group, String dataSourceId) {
-        List<String> dataSourceGroupList = dataSourceGroupIds.get(group);
-        if (null != dataSourceGroupList && !dataSourceGroupList.isEmpty()) {
-            return dataSourceGroupList.contains(dataSourceId);
+    public static boolean containsDataSourceGroup(String dataSourceId) {
+        for (Map.Entry<String, List<String>> entry : dataSourceGroupIds.entrySet()) {
+            if (entry.getValue().contains(dataSourceId)) {
+                return true;
+            }
         }
         return false;
     }

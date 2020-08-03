@@ -28,33 +28,65 @@ public class DynamicDataSourceAspect {
 
     @Before("@annotation(targetDataSource)")
     public void changeDataSource(JoinPoint point, TargetDataSource targetDataSource) {
-        String dsName = targetDataSource == null ?
-                DynamicDbSource.get() : StringUtils.isEmpty(targetDataSource.value()) ?
-                DynamicDbSource.get() : targetDataSource.value();
+        String dsName = targetDataSource.value(), groupName = null, balanceType = null;
 
-        //优先使用直连
+        //注解未分组配置
+        if (StringUtils.isEmpty(dsName)) {
+            dsName = targetDataSource.groupId();
+            groupName = targetDataSource.groupName();
+            balanceType = targetDataSource.balanceType();
+        }
+
+        // db未分组配置
+        if (StringUtils.isEmpty(dsName)) {
+            dsName = DynamicDbSource.get();
+
+            //db分组配置
+            if (StringUtils.isEmpty(dsName)) {
+                dsName = DynamicDbSource.getGroupDataSource().getGroupId();
+                groupName = DynamicDbSource.getGroupDataSource().getGroupName();
+                balanceType = DynamicDbSource.getGroupDataSource().getBalanceType();
+            }
+        }
+
         if (DynamicDataSourceContextHolder.containsDataSource(dsName)) {
+
             logger.debug("Use DataSource name = [{}] , signature = [{}]", dsName, point.getSignature());
             DynamicDataSourceContextHolder.setDataSourceName(dsName);
+        } else if (DynamicDataSourceContextHolder.containsDataSourceGroup(dsName)) {
+
+            logger.debug("Use DataSource name = [{}] , signature = [{}]", dsName, point.getSignature());
+            DynamicDataSourceContextHolder.setDataSourceGroup(groupName, dsName, balanceType);
         } else {
 
-            String groupName = targetDataSource.groupName();
-            if (StringUtils.isEmpty(groupName)) {
-                logger.error("DataSource [{}] not existing, Used default datasource [{}]", dsName, point.getSignature());
-            } else {
-                DynamicDataSourceContextHolder.setDataSourceGroup(groupName, targetDataSource.groupId(), targetDataSource.balanceType());
-            }
+            logger.error("DataSource [{}] not existing, Used default datasource [{}]", dsName, point.getSignature());
         }
     }
 
     @After("@annotation(targetDataSource)")
     public void restoreDataSource(JoinPoint point, TargetDataSource targetDataSource) {
-        String dsName = targetDataSource == null ?
-                DynamicDbSource.get() : StringUtils.isEmpty(targetDataSource.value()) ?
-                DynamicDbSource.get() : targetDataSource.value();
-        logger.debug("Revert DataSource = [{}] ,  signature = [{}]", dsName, point.getSignature());
-        DynamicDataSourceContextHolder.clearDataSource();
-        DynamicDbSource.remove();
+        String dsName = targetDataSource.value();
+
+        //注解未分组配置
+        if (StringUtils.isEmpty(dsName)) {
+            dsName = targetDataSource.groupId();
+        }
+
+        // db未分组配置
+        if (StringUtils.isEmpty(dsName)) {
+            dsName = DynamicDbSource.get();
+
+            //db分组配置
+            if (StringUtils.isEmpty(dsName)) {
+                dsName = DynamicDbSource.getGroupDataSource().getGroupId();
+            }
+        }
+
+        if (!StringUtils.isEmpty(dsName)) {
+            logger.debug("Revert DataSource = [{}] ,  signature = [{}]", dsName, point.getSignature());
+            DynamicDataSourceContextHolder.clearDataSource();
+            DynamicDbSource.remove();
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package com.xieahui.springboot.config;
 
+import com.xieahui.springboot.GroupDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,14 +12,27 @@ public class DynamicDbSource {
 
     static Logger logger = LoggerFactory.getLogger(DynamicDbSource.class);
 
-    private final static ThreadLocal<String> dataSource = new ThreadLocal();
+    private final static ThreadLocal<GroupDataSource> dataSource = new ThreadLocal();
 
-    public static void set(String targetDataSourceName) {
-        logger.info("Set-Thread-Id = " + Thread.currentThread().getId() + " ;targetDataSourceName = " + targetDataSourceName);
-        dataSource.set(targetDataSourceName);
+    public static void set(String targetDataSourceId) {
+        logger.info("Set-Thread-Id = " + Thread.currentThread().getId() + " ;targetDataSourceName = " + targetDataSourceId);
+        dataSource.set(new GroupDataSource(targetDataSourceId));
+    }
+
+    public static void set(String targetDataSourceGroupName, String targetDataSourceId, String targetBalanceType) {
+        logger.info("Set-Thread-Id = " + Thread.currentThread().getId()
+                + " ;targetDataSourceGroupName = " + targetDataSourceGroupName
+                + " ;targetDataSourceName = " + targetDataSourceId
+                + " ;targetBalanceType = " + targetBalanceType);
+        dataSource.set(new GroupDataSource(targetDataSourceGroupName, targetDataSourceId, targetBalanceType));
     }
 
     public static String get() {
+        logger.info("Get-Thread-Id = " + Thread.currentThread().getId() + " ;targetDataSourceName = " + dataSource.get());
+        return dataSource.get().getGroupId();
+    }
+
+    public static GroupDataSource getGroupDataSource() {
         logger.info("Get-Thread-Id = " + Thread.currentThread().getId() + " ;targetDataSourceName = " + dataSource.get());
         return dataSource.get();
     }
