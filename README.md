@@ -25,6 +25,9 @@
 ### 使用实例
 和该项目配置的[实例项目](https://github.com/xieyucan/easy-connection-pool-demo) 可以点击查看
 
+### V1.1.1 - 更新说明
+优化部分逻辑,修复bug.
+
 ### V1.1.0 - 更新说明
 ```javascript
 主要增加如下：
