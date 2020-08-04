@@ -63,13 +63,11 @@ public class DynamicDbSource {
     }
 
     public static String get() {
-        logger.info("Get-Thread-Id = " + Thread.currentThread().getId() + " ;targetDataSourceName = " + dataSource.get());
         GroupDataSource groupDataSource = dataSource.get();
         return null == groupDataSource ? "" : groupDataSource.getGroupId();
     }
 
     public static GroupDataSource getGroupDataSource() {
-        logger.info("Get-Thread-Id = " + Thread.currentThread().getId() + " ;targetDataSourceName = " + dataSource.get());
         return dataSource.get();
     }
 

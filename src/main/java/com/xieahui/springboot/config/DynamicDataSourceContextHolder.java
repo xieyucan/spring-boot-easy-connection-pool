@@ -1,9 +1,7 @@
 package com.xieahui.springboot.config;
 
-import com.xieahui.springboot.LoadBalance;
+import com.xieahui.springboot.LoadBalanceFactory;
 import com.xieahui.springboot.LoadBalanceType;
-import com.xieahui.springboot.RandomLoadBalance;
-import com.xieahui.springboot.RoundRobinLoadBalance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -45,16 +43,8 @@ public class DynamicDataSourceContextHolder {
         if (StringUtils.isEmpty(dataSourceGroupId)) {
 
             List<String> dataSourceGroupList = dataSourceGroupIds.get(dataSourceGroupName);
-
-            //轮询
-            LoadBalance loadBalance = new RoundRobinLoadBalance(dataSourceGroupList, dataSourceGroupName);
-
-            //随机
-            if (LoadBalanceType.RANDOM.equals(balanceType)) {
-                loadBalance = new RandomLoadBalance(dataSourceGroupList);
-            }
-
-            dataSourceGroupId = loadBalance.select();
+            dataSourceGroupId = LoadBalanceFactory
+                    .getLoadBalance(dataSourceGroupList, dataSourceGroupName, balanceType);
             logger.debug("Use DataSource name = [{}] ", dataSourceGroupId);
         }
 
