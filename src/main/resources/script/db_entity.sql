@@ -8,7 +8,7 @@ CREATE TABLE `db_entity` (
   `minimum_idle` int(11) DEFAULT '5' COMMENT '最小空闲连接数',
   `maximum_pool_size` int(11) DEFAULT '10' COMMENT '最大连接数',
   `connection_test_query` varchar(45) DEFAULT 'SELECT 1' COMMENT '测试连接是否有效SQL',
-  `group_name` varchar(45) DEFAULT NULL COMMENT '分组名',
+  `group_name` varchar(45) NOT NULL COMMENT '分组名',
   `balance_type` varchar(45) DEFAULT NULL COMMENT '负载均衡类型',
   PRIMARY KEY (`id`),
   UNIQUE KEY `pool_name_UNIQUE` (`pool_name`)

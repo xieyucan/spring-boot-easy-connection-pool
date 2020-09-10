@@ -34,9 +34,11 @@ public class DynamicDataSourceContextHolder {
     }
 
     /**
-     * 通过数据源分组设置当前数据源
+     * 设置分组
      *
-     * @param dataSourceGroupName 数据源分组
+     * @param dataSourceGroupName
+     * @param dataSourceGroupId
+     * @param balanceType
      */
     public static void setDataSourceGroup(String dataSourceGroupName, String dataSourceGroupId, LoadBalanceType balanceType) {
 
@@ -73,7 +75,7 @@ public class DynamicDataSourceContextHolder {
      * 判断指定Group的DataSource当前是否存在
      *
      * @param groupName 数据源名
-     * @return
+     * @return 是否存在分组
      */
     public static boolean containsDataSourceGroup(String groupName) {
         return dataSourceGroupIds.containsKey(groupName);

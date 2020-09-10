@@ -58,6 +58,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
     private void initDefaultDataSource(Environment env) {
         // 读取主数据源
         DataSource dataSource = buildDataSource("", env);
+        if (null == dataSource) return;
         logger.info("*** Create DataSource Default Success! ***");
         logger.info("***Print-Tables-Start***:");
         printDbTable(dataSource);
@@ -75,6 +76,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
         if (!StringUtils.isEmpty(dsPrefixes)) {
             Arrays.stream(dsPrefixes.split(",")).forEach(dsPrefix -> {
                 DataSource dataSource = buildDataSource(dsPrefix, environment);
+                if (null == dataSource) return;
                 logger.info("*** Create DataSource {} Success! ***", dsPrefix);
                 logger.info("***Print-Tables-Start***:");
                 printDbTable(dataSource);
@@ -91,7 +93,8 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
     private void initCustomDbDataSources(Environment environment) {
         if (environment.getProperty(Contains.getDbOpen(), Boolean.class) == null ? false : true) {
             JdbcTemplate jdbcTemplate = new JdbcTemplate(this.defaultDataSource);
-            List<Map<String, Object>> entityList = queryDbEntityList(jdbcTemplate);
+            String dbName = environment.getProperty(Contains.getDbTableName()) == null ? "db" : environment.getProperty(Contains.getDbTableName());
+            List<Map<String, Object>> entityList = queryDbEntityList(jdbcTemplate, dbName);
             //添加分组数据
             customDataSourcesGroup.putAll(buildGroupDataSource(entityList));
             for (int i = 0; i < entityList.size(); i++) {
@@ -120,7 +123,14 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
         return hikariConfig;
     }
 
-    public List<Map<String, Object>> queryDbEntityList(JdbcTemplate jdbcTemplate) {
+    /**
+     * 获取数据库配置字段
+     *
+     * @param jdbcTemplate 数据库连接
+     * @param dbName       存放数据源的表明
+     * @return java.util.List<java.util.Map < java.lang.String, java.lang.Object>>
+     */
+    public List<Map<String, Object>> queryDbEntityList(JdbcTemplate jdbcTemplate, String dbName) {
         List<Map<String, Object>> result = new ArrayList();
         jdbcTemplate.query("SELECT " +
                         "driver_class_name, " +
@@ -133,7 +143,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
                         "minimum_idle, " +
                         "maximum_pool_size, " +
                         "connection_test_query " +
-                        "FROM db_entity"
+                        "FROM " + dbName
                 , rs -> {
                     while (rs.next()) {
                         Map<String, Object> item = new HashMap();
@@ -205,6 +215,8 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
             }
         }
 
+        if (StringUtils.isEmpty(hikariConfig.getJdbcUrl()))
+            return null;
         DataSource hikariDataSource = new HikariDataSource(hikariConfig);
         return hikariDataSource;
     }
@@ -231,7 +243,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
      * 按照group_name分组数据源
      *
      * @param entityList
-     * @return
+     * @return 构建分组数据
      */
     public Map<String, List<String>> buildGroupDataSource(List<Map<String, Object>> entityList) {
         Map<String, List<String>> result = new ConcurrentHashMap();
@@ -257,7 +269,7 @@ public class DynamicDataSourceRegister implements ImportBeanDefinitionRegistrar,
      * 按照group_name分组数据源
      *
      * @param environment
-     * @return
+     * @return 构建分组数据
      */
     public Map<String, List<String>> buildGroupDataSource(Environment environment) {
         Map<String, List<String>> result = new ConcurrentHashMap();

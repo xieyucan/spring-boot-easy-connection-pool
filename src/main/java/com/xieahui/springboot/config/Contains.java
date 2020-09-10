@@ -58,6 +58,15 @@ public class Contains {
         return String.format("%s.%s", DB_SETTING_PREFIX, DB_OPEN);
     }
 
+    /**
+     * 设置数据库资源配置表名称, 默认为db
+     *
+     * @return java.lang.String
+     */
+    public static String getDbTableName() {
+        return String.format("%s.%s", DB_SETTING_PREFIX, DB_TABLE_NAME);
+    }
+
 
     /**
      * 获取默认连接池类型
@@ -187,6 +196,17 @@ public class Contains {
      * 是否开启数据源配置
      */
     private static String DB_OPEN = ".db.open";
+
+    /**
+     * 数据源名称
+     * 不设置默认为db
+     *
+     * @param null
+     * @author brucexie
+     * @date 2020/8/20 1:32 下午
+     * @return
+     */
+    private static String DB_TABLE_NAME = "table.name";
 
     /**
      * 属性名构建格式

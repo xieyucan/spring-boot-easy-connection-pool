@@ -8,7 +8,7 @@ public interface LoadBalance<T> {
     /**
      * 获取分组连接
      *
-     * @return
+     * @return 分组类型
      */
     T select();
 }
